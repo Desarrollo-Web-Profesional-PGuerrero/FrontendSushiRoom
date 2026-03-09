@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Menu.module.css';
 
-// Datos temporales hasta que tengamos backend
+// Datos temporales hasta que tengamos backend - Precios en MXN
 const productosMock = [
-  { id: 1, nombre: 'Salmón Nigiri', precio: 12000, imagen: '/src/assets/images/salmon.jpg' },
-  { id: 2, nombre: 'Atún Nigiri', precio: 14000, imagen: '/src/assets/images/tuna.jpg' },
-  { id: 3, nombre: 'Roll California', precio: 18000, imagen: '/src/assets/images/california.png' },
-  { id: 4, nombre: 'Roll Spicy Tuna', precio: 20000, imagen: '/src/assets/images/spicy.jpg' },
-  { id: 5, nombre: 'Sashimi Salmón', precio: 22000, imagen: '/src/assets/images/sashimi.png' },
-  { id: 6, nombre: 'Ebi Roll', precio: 19000, imagen: '/src/assets/images/ebi.jpg' },
+  { id: 1, nombre: 'Salmón Nigiri', precio: 105, imagen: '/src/assets/images/salmon.jpg' },
+  { id: 2, nombre: 'Atún Nigiri', precio: 115, imagen: '/src/assets/images/tuna.jpg' },
+  { id: 3, nombre: 'Roll California', precio: 125, imagen: '/src/assets/images/california.png' },
+  { id: 4, nombre: 'Roll Spicy Tuna', precio: 130, imagen: '/src/assets/images/spicy.jpg' },
+  { id: 5, nombre: 'Sashimi Salmón', precio: 120, imagen: '/src/assets/images/sashimi.png' },
+  { id: 6, nombre: 'Ebi Roll', precio: 110, imagen: '/src/assets/images/ebi.jpg' },
 ];
 
 const Menu = () => {
@@ -21,7 +21,7 @@ const Menu = () => {
     setTimeout(() => {
       setProductos(productosMock);
       setLoading(false);
-    }, 1000);
+    }, 100);
   }, []);
 
   if (loading) {
@@ -38,7 +38,7 @@ const Menu = () => {
               <img src={producto.imagen} alt={producto.nombre} />
             </div>
             <h3>{producto.nombre}</h3>
-            <p className={styles.precio}>${producto.precio.toLocaleString()}</p>
+            <p className={styles.precio}>${producto.precio} MXN</p>
           </Link>
         ))}
       </div>

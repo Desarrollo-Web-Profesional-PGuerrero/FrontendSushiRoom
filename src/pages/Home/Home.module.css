@@ -8,15 +8,20 @@
   overflow: hidden;
 }
 
+/* Cambiamos el fondoPlaceholder para que sea la imagen */
 .fondoPlaceholder {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+  background-image: url('/src/assets/images/casajapo.jpg'); /* Ajusta la ruta según tu carpeta */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   position: absolute;
   top: 0;
   left: 0;
 }
 
+/* Overlay más oscuro para asegurar legibilidad del texto */
 .overlay {
   position: absolute;
   top: 0;
@@ -29,7 +34,10 @@
   align-items: center;
   color: white;
   text-align: center;
-  background-color: rgba(0, 0, 0, 0.4);
+  /* Overlay más oscuro (0.6) para mejor contraste */
+  background-color: rgba(0, 0, 0, 0.6);
+  /* O puedes usar un degradado para un efecto más elegante: */
+  /* background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 100%); */
 }
 
 .overlay h1 {
@@ -37,12 +45,15 @@
   margin-bottom: 1rem;
   font-family: 'Cormorant Garamond', serif;
   animation: fadeInUp 1.5s ease;
+  /* Sombra de texto extra para mejor legibilidad */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .subtitle {
   font-size: 1.5rem;
   margin-bottom: 2rem;
   animation: fadeInUp 1.5s ease 0.3s both;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
 }
 
 .btn {
@@ -54,11 +65,14 @@
   font-weight: bold;
   transition: all 0.3s;
   animation: fadeInUp 1.5s ease 0.6s both;
+  /* Sombra en el botón también */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 .btn:hover {
   background-color: #8b1a1a;
   transform: scale(1.05);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
 }
 
 @keyframes fadeInUp {
@@ -79,5 +93,9 @@
   
   .subtitle {
     font-size: 1.2rem;
+  }
+  
+  .btn {
+    padding: 0.8rem 2rem;
   }
 }
