@@ -1,0 +1,443 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Noto+Serif+JP:wght@300;400;500&display=swap');
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+  font-family: 'Inter', sans-serif;
+  background: #fffaf7; /* Fondo cálido como el papel de arroz */
+  min-height: 100vh;
+}
+
+/* Elemento decorativo - como un sello tradicional */
+.container::before {
+  content: "●";
+  position: fixed;
+  top: 2rem;
+  right: 2rem;
+  font-size: 0.8rem;
+  color: #c93b3b20;
+  font-family: serif;
+  opacity: 0.3;
+  transform: rotate(15deg);
+}
+
+.backButton {
+  background: none;
+  border: none;
+  color: #594d46;
+  font-size: 0.95rem;
+  cursor: pointer;
+  padding: 0.5rem 0;
+  margin-bottom: 2rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 300;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  border-bottom: 1px solid transparent;
+}
+
+.backButton::before {
+  content: "←";
+  font-size: 1.2rem;
+  opacity: 0.6;
+  transition: transform 0.3s ease;
+}
+
+.backButton:hover {
+  color: #b13e3e;
+  border-bottom-color: #b13e3e20;
+}
+
+.backButton:hover::before {
+  transform: translateX(-3px);
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  position: relative;
+}
+
+/* Línea divisoria vertical - inspiración japonesa */
+.content::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 10%;
+  bottom: 10%;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, #d4c9c2 20%, #d4c9c2 80%, transparent);
+  transform: translateX(-50%);
+}
+
+.imageSection {
+  position: relative;
+  padding: 1rem;
+}
+
+/* Marco tradicional japonés */
+.imageSection::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 1px solid #d4c9c2;
+  border-radius: 2px;
+  z-index: 1;
+}
+
+/* Esquinas decorativas */
+.imageSection::after {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  width: 30px;
+  height: 30px;
+  border-top: 2px solid #b13e3e60;
+  border-left: 2px solid #b13e3e60;
+  z-index: 2;
+}
+
+.image {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  position: relative;
+  z-index: 3;
+  transition: transform 0.5s ease;
+}
+
+.image:hover {
+  transform: scale(1.02);
+}
+
+.infoSection {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 1rem 0;
+}
+
+.nombre {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 2.8rem;
+  font-weight: 300;
+  margin: 0;
+  color: #2c2c2c;
+  letter-spacing: 2px;
+  position: relative;
+  display: inline-block;
+  padding-bottom: 1rem;
+}
+
+/* Línea bajo el nombre - como un kanji elegante */
+.nombre::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, #b13e3e, #b13e3e40);
+}
+
+.precio {
+  font-size: 2.2rem;
+  color: #b13e3e;
+  font-weight: 300;
+  margin: 0;
+  position: relative;
+}
+
+.precio::before {
+  content: '¥';
+  font-size: 1.5rem;
+  margin-right: 0.5rem;
+  opacity: 0.7;
+}
+
+.section {
+  border-bottom: none;
+  padding-bottom: 0;
+  position: relative;
+}
+
+.section h3 {
+  font-family: 'Noto Serif JP', serif;
+  margin: 0 0 0.8rem 0;
+  color: #594d46;
+  font-size: 1.2rem;
+  font-weight: 400;
+  letter-spacing: 1.5px;
+  display: flex;
+  align-items: center;
+}
+
+/* Iconos sutiles para cada sección */
+.section h3::before {
+  content: '◈';
+  font-size: 0.8rem;
+  margin-right: 0.8rem;
+  color: #b13e3e80;
+}
+
+.section p {
+  margin: 0;
+  color: #4a4a4a;
+  line-height: 1.9;
+  font-weight: 300;
+  font-size: 1rem;
+}
+
+.ingredientesList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.ingredientesList li {
+  background: #f5f0eb;
+  padding: 0.4rem 1.2rem;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  color: #594d46;
+  font-weight: 300;
+  border: 1px solid #e5dad2;
+  transition: all 0.3s ease;
+}
+
+.ingredientesList li:hover {
+  background: #e5dad2;
+  border-color: #b13e3e40;
+}
+
+.carritoSection {
+  margin-top: 2rem;
+  padding: 2rem 1.5rem;
+  background: #ffffffd9;
+  border: 1px solid #e5dad2;
+  position: relative;
+  backdrop-filter: blur(5px);
+}
+
+/* Sello de calidad japonés */
+.carritoSection::before {
+  content: '◎';
+  position: absolute;
+  top: -10px;
+  right: 20px;
+  font-size: 2rem;
+  color: #b13e3e15;
+  font-family: serif;
+  transform: rotate(10deg);
+}
+
+.cantidadControl {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.cantidadControl label {
+  font-weight: 300;
+  color: #594d46;
+  letter-spacing: 1px;
+  font-size: 0.95rem;
+}
+
+.cantidadInput {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.cantidadBtn {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #e5dad2;
+  background: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  color: #594d46;
+  border-radius: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.cantidadBtn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: #b13e3e10;
+  border-radius: 50%;
+  transition: all 0.5s ease;
+}
+
+.cantidadBtn:hover {
+  border-color: #b13e3e;
+  color: #b13e3e;
+}
+
+.cantidadBtn:hover::before {
+  width: 100px;
+  height: 100px;
+  top: -30px;
+  left: -30px;
+}
+
+.cantidadInput span {
+  font-size: 1.2rem;
+  color: #2c2c2c;
+  min-width: 30px;
+  text-align: center;
+  font-weight: 300;
+}
+
+.agregarBtn {
+  width: 100%;
+  padding: 1.2rem;
+  background: transparent;
+  color: #b13e3e;
+  border: 1px solid #b13e3e;
+  font-size: 1rem;
+  font-weight: 300;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.agregarBtn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: #b13e3e;
+  transition: all 0.4s ease;
+  z-index: -1;
+}
+
+.agregarBtn:hover {
+  color: white;
+}
+
+.agregarBtn:hover::before {
+  left: 0;
+}
+
+.loading {
+  text-align: center;
+  padding: 4rem;
+  color: #594d46;
+  font-weight: 300;
+  letter-spacing: 2px;
+  position: relative;
+}
+
+.loading::after {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 40px;
+  margin: 2rem auto;
+  border: 1px solid #e5dad2;
+  border-top: 1px solid #b13e3e;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.notFound {
+  text-align: center;
+  padding: 4rem;
+  color: #594d46;
+}
+
+.notFound h2 {
+  font-family: 'Noto Serif JP', serif;
+  font-weight: 300;
+  margin-bottom: 2rem;
+  position: relative;
+  display: inline-block;
+  padding: 0 2rem;
+}
+
+.notFound h2::before,
+.notFound h2::after {
+  content: '◇';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8rem;
+  color: #b13e3e80;
+}
+
+.notFound h2::before {
+  left: 0;
+}
+
+.notFound h2::after {
+  right: 0;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 2rem 1rem;
+  }
+
+  .content {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .content::after {
+    display: none;
+  }
+
+  .nombre {
+    font-size: 2.2rem;
+  }
+
+  .precio {
+    font-size: 1.8rem;
+  }
+
+  .imageSection {
+    padding: 0.5rem;
+  }
+}
+
+/* Toque zen - espacio vacío consciente */
+@media (min-width: 1200px) {
+  .infoSection {
+    padding-right: 2rem;
+  }
+}   
