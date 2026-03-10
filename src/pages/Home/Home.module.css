@@ -59,6 +59,7 @@
   overflow: hidden;
 }
 
+/* Cambiamos el fondoPlaceholder para que sea la imagen */
 .fondoPlaceholder {
   position: absolute;
   top: 0;
@@ -86,6 +87,7 @@
   );
 }
 
+/* Overlay más oscuro para asegurar legibilidad del texto */
 .overlay {
   position: absolute;
   top: 0;
@@ -379,5 +381,9 @@
   .decorativeCircle {
     width: 200px;
     height: 200px;
+  }
+  
+  .btn {
+    padding: 0.8rem 2rem;
   }
 }

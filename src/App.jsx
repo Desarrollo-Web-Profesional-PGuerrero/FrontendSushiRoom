@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home/Home';
 import Menu from './pages/Menu/Menu';
-//import ProductoDetalle from './pages/ProductoDetalle/ProductoDetalle'; --> por el momento no lo ocupo
+import ProductoDetalle from './pages/ProductoDetalle/ProductoDetalle';
 import './App.css';
 
 function App() {
@@ -13,7 +13,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/menu" element={<Menu />} />
-            {/* <Route path="/producto/:id" element={<ProductoDetalle />} /> */} {/* ← Comentado */}
+            <Route path="/producto/:id" element={<ProductoDetalle />} />
           </Routes>
         </main>
       </div>
