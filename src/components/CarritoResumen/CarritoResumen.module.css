@@ -1,0 +1,434 @@
+/* src/pages/CarritoResumen/CarritoResumen.module.css */
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #023820 0%, #035a2e 100%);
+  padding: 2rem;
+}
+
+.resumen {
+  max-width: 800px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 24px;
+  padding: 2rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.resumen h1 {
+  color: #023820;
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-family: 'Cormorant Garamond', serif;
+  border-bottom: 2px solid #F9A11B;
+  padding-bottom: 1rem;
+}
+
+/* Notificación flotante */
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #28a745;
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  transform: translateX(400px);
+  transition: transform 0.3s ease;
+}
+
+.notificationShow {
+  transform: translateX(0);
+}
+
+.notificationIcon {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+/* Lista de productos */
+.lista {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #FFF4E6;
+  border-radius: 16px;
+  border: 1px solid #FFEFCB;
+  transition: transform 0.2s;
+}
+
+.item:hover {
+  transform: translateX(5px);
+  box-shadow: 0 4px 8px rgba(238, 63, 36, 0.1);
+}
+
+.imagen {
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  object-fit: cover;
+  background: linear-gradient(135deg, #023820, #EE3F24);
+}
+
+.info {
+  flex: 2;
+}
+
+.info h3 {
+  color: #023820;
+  font-size: 1.1rem;
+  margin-bottom: 0.3rem;
+}
+
+.precio {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Controles de cantidad */
+.cantidad {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: white;
+  padding: 0.3rem;
+  border-radius: 8px;
+  border: 1px solid #FFEFCB;
+}
+
+.btnCantidad {
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: white;
+  color: #023820;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.btnCantidad:hover:not(:disabled) {
+  background: #FFEFCB;
+}
+
+.btnCantidad:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.cantidad span {
+  min-width: 30px;
+  text-align: center;
+  font-weight: bold;
+  color: #023820;
+}
+
+.subtotal {
+  min-width: 100px;
+  text-align: right;
+  font-weight: bold;
+  color: #EE3F24;
+  font-size: 1.1rem;
+}
+
+.btnEliminar {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: rgba(238, 63, 36, 0.1);
+  color: #EE3F24;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btnEliminar:hover {
+  background: #EE3F24;
+  color: white;
+}
+
+/* Footer con total y botón */
+.footer {
+  border-top: 2px solid #FFEFCB;
+  padding-top: 2rem;
+}
+
+.total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+  padding: 0 0.5rem;
+}
+
+.totalMonto {
+  color: #EE3F24;
+  font-weight: bold;
+  font-size: 2rem;
+}
+
+.btnPago {
+  width: 100%;
+  padding: 1rem;
+  background: #EE3F24;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btnPago:hover {
+  background: #c62d1a;
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(238, 63, 36, 0.3);
+}
+
+/* Carrito vacío */
+.carritoVacio {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: linear-gradient(135deg, #023820 0%, #035a2e 100%);
+  color: white;
+  padding: 2rem;
+}
+
+.carritoVacio h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.carritoVacio p {
+  margin-bottom: 2rem;
+  opacity: 0.9;
+}
+
+.btnMenu {
+  background: #F9A11B;
+  color: #023820;
+  text-decoration: none;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-weight: bold;
+  transition: transform 0.3s;
+}
+
+.btnMenu:hover {
+  transform: scale(1.05);
+}
+
+/* Loading */
+.loading {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #023820 0%, #035a2e 100%);
+  color: white;
+}
+
+.loadingSpinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid #FFEFCB;
+  border-top-color: #EE3F24;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .resumen {
+    padding: 1rem;
+  }
+  
+  .resumen h1 {
+    font-size: 2rem;
+  }
+  
+  .item {
+    flex-wrap: wrap;
+    position: relative;
+    padding-bottom: 2rem;
+  }
+  
+  .imagen {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .info {
+    flex: 1;
+    min-width: 150px;
+  }
+  
+  .subtotal {
+    min-width: auto;
+    margin-left: auto;
+  }
+  
+  .btnEliminar {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+  }
+  
+  .total {
+    font-size: 1.1rem;
+  }
+  
+  .totalMonto {
+    font-size: 1.5rem;
+  }
+  
+  .notification {
+    top: 10px;
+    right: 10px;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Modal de confirmación */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal {
+  background: white;
+  border-radius: 24px;
+  padding: 2rem;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  animation: slideUp 0.3s ease;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.modalIcon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.modal h3 {
+  color: #023820;
+  font-size: 1.5rem;
+  margin-bottom: 0.8rem;
+  font-family: 'Cormorant Garamond', serif;
+}
+
+.modal p {
+  color: #666;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.modal p strong {
+  color: #EE3F24;
+}
+
+.modalButtons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.modalBtnCancelar,
+.modalBtnConfirmar {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+}
+
+.modalBtnCancelar {
+  background: #f0f0f0;
+  color: #666;
+}
+
+.modalBtnCancelar:hover {
+  background: #e0e0e0;
+  transform: scale(1.02);
+}
+
+.modalBtnConfirmar {
+  background: #EE3F24;
+  color: white;
+}
+
+.modalBtnConfirmar:hover {
+  background: #c62d1a;
+  transform: scale(1.02);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
