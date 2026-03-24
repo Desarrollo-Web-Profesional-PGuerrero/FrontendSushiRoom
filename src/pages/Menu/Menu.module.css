@@ -14,7 +14,6 @@ body {
   min-height: 100vh;
 }
 
-/* Para el contenedor root de React */
 #root {
   min-height: 100vh;
   background: transparent;
@@ -28,7 +27,6 @@ body {
   color: var(--crema-claro);
 }
 
-/* Efecto de textura sutil */
 .menu::before {
   content: '';
   position: absolute;
@@ -46,15 +44,12 @@ body {
   margin-bottom: 2rem;
   text-align: center;
   font-family: 'Cormorant Garamond', serif;
-  text-shadow: 
-    0 4px 8px rgba(2, 56, 32, 0.5),
-    2px 2px 0 var(--rojo);
+  text-shadow: 0 4px 8px rgba(2, 56, 32, 0.5), 2px 2px 0 var(--rojo);
   letter-spacing: 2px;
   position: relative;
   z-index: 1;
 }
 
-/* Línea decorativa debajo del título */
 .menu h1::after {
   content: '';
   display: block;
@@ -73,45 +68,23 @@ body {
   z-index: 1;
 }
 
+/* Card - versión definitiva */
 .card {
-  text-decoration: none;
-  color: inherit;
-  background: rgba(255, 244, 230, 0.15);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.95);
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 
-    0 10px 20px -5px rgba(2, 56, 32, 0.5),
-    inset 0 0 0 1px rgba(255, 239, 203, 0.2);
+  box-shadow: 0 10px 20px -5px rgba(2, 56, 32, 0.5);
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   border: 1px solid rgba(249, 161, 27, 0.3);
   position: relative;
-}
-
-.card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(circle at 50% 0%, rgba(238, 63, 36, 0.15), transparent 70%);
-  opacity: 0;
-  transition: opacity 0.4s;
+  display: flex;
+  flex-direction: column;
 }
 
 .card:hover {
   transform: translateY(-8px) scale(1.02);
-  box-shadow: 
-    0 20px 30px -8px var(--verde-oscuro),
-    inset 0 0 0 2px rgba(238, 63, 36, 0.5);
+  box-shadow: 0 20px 30px -8px var(--verde-oscuro);
   border-color: var(--rojo);
-  background: rgba(255, 244, 230, 0.25);
-}
-
-.card:hover::before {
-  opacity: 1;
 }
 
 .imageContainer {
@@ -122,7 +95,6 @@ body {
   position: relative;
 }
 
-/* Efecto de brillo en la esquina de la imagen */
 .imageContainer::after {
   content: '';
   position: absolute;
@@ -152,16 +124,21 @@ body {
   transform: scale(1.1);
 }
 
+.cardLink {
+  text-decoration: none;
+  display: block;
+  flex: 1;
+}
+
 .card h3 {
   padding: 1.2rem 1.2rem 0.5rem;
   font-size: 1.3rem;
-  color: var(--crema);
+  color: var(--verde-oscuro);
   font-weight: 600;
-  text-shadow: 0 2px 4px var(--verde-oscuro);
   position: relative;
+  margin: 0;
 }
 
-/* Detalle decorativo en cada tarjeta */
 .card h3::before {
   content: '•';
   color: var(--rojo);
@@ -172,31 +149,83 @@ body {
 }
 
 .precio {
-  padding: 0.5rem 1.2rem 1.5rem;
-  color: var(--naranja);
+  padding: 0 1.2rem 0.5rem;
+  color: var(--rojo);
   font-weight: bold;
   font-size: 1.3rem;
   font-family: 'Cormorant Garamond', serif;
   letter-spacing: 1px;
-  position: relative;
   display: inline-block;
+  margin: 0;
 }
 
-/* Efecto de etiqueta para el precio */
 .precio::before {
   content: '$';
   margin-right: 2px;
   font-size: 1rem;
-  color: var(--crema-claro);
-  opacity: 1;
+  color: var(--verde-oscuro);
+  opacity: 0.8;
 }
 
-.precio::after {
-  margin-left: 4px;
-  font-size: 0.8rem;
-  color: var(--crema-claro);
-  opacity: 0.7;
-  font-weight: normal;
+/* Botón agregar al carrito */
+.btnAgregar {
+  width: calc(100% - 2rem);
+  margin: 0.5rem 1rem 1rem 1rem;
+  padding: 0.75rem;
+  background: var(--naranja);
+  color: var(--verde-oscuro);
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  position: relative;
+  z-index: 20;
+  pointer-events: auto;
+}
+
+.btnAgregar:hover {
+  background: var(--rojo);
+  color: white;
+  transform: scale(1.02);
+}
+
+.btnAgregando {
+  background: #28a745 !important;
+  color: white !important;
+}
+
+/* Notificación flotante */
+.notification {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  background: #28a745;
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  transform: translateX(400px);
+  transition: transform 0.3s ease;
+}
+
+.notificationShow {
+  transform: translateX(0);
+}
+
+.notificationIcon {
+  font-size: 1.2rem;
+  font-weight: bold;
 }
 
 .loading {
@@ -206,16 +235,12 @@ body {
   color: var(--crema);
   background: rgba(2, 56, 32, 0.7);
   backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   border-radius: 16px;
   margin: 2rem;
-  border: 1px solid rgba(249, 161, 27, 0.3);
-  box-shadow: 0 10px 30px rgba(2, 56, 32, 0.5);
   position: relative;
   overflow: hidden;
 }
 
-/* Animación de carga */
 .loading::after {
   content: '';
   position: absolute;
@@ -250,6 +275,13 @@ body {
   .menu h1::after {
     width: 100px;
   }
+  
+  .notification {
+    top: 70px;
+    right: 10px;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -260,8 +292,77 @@ body {
   .menu h1 {
     font-size: 2rem;
   }
-  
-  .card {
-    max-width: 100%;
+}
+
+/* Agrega esto a tu Menu.module.css */
+
+.loadingSpinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid var(--crema-claro);
+  border-top-color: var(--rojo);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
+}
+
+.error {
+  max-width: 600px;
+  margin: 4rem auto;
+  padding: 2rem;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  color: var(--rojo);
+}
+
+.error h2 {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.error p {
+  margin-bottom: 1.5rem;
+  color: #666;
+}
+
+.btnReintentar {
+  background: var(--rojo);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.btnReintentar:hover {
+  background: var(--naranja);
+  transform: scale(1.02);
+}
+
+.vacio {
+  max-width: 600px;
+  margin: 4rem auto;
+  padding: 2rem;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  color: var(--verde-oscuro);
+}
+
+.vacio h2 {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.vacio p {
+  color: #666;
 }
