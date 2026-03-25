@@ -12,6 +12,11 @@ const ProductoDetalle = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [cantidad, setCantidad] = useState(1);
+  const [personalizacion, setPersonalizacion] = useState({
+    nivelPicante: 0,
+    tipoArroz: 'blanco',
+    notasChef: ''
+  });
   const { addToCart, notification } = useCart();
 
   useEffect(() => {
@@ -24,7 +29,6 @@ const ProductoDetalle = () => {
       const data = await getProductoById(id);
       
       if (data) {
-        // Transformar datos al formato del frontend
         const productoFormateado = {
           id: data.id,
           nombre: data.nombre,
@@ -48,9 +52,45 @@ const ProductoDetalle = () => {
     }
   };
 
+  const handleNivelPicanteChange = (e) => {
+    setPersonalizacion({
+      ...personalizacion,
+      nivelPicante: parseInt(e.target.value)
+    });
+  };
+
+  const handleTipoArrozChange = (e) => {
+    setPersonalizacion({
+      ...personalizacion,
+      tipoArroz: e.target.value
+    });
+  };
+
+  const handleNotasChefChange = (e) => {
+    setPersonalizacion({
+      ...personalizacion,
+      notasChef: e.target.value
+    });
+  };
+
   const handleAgregarCarrito = () => {
-    // Agregar producto al carrito con la cantidad seleccionada
-    addToCart(producto, cantidad);
+    const productoPersonalizado = {
+      ...producto,
+      personalizacion: {
+        nivelPicante: personalizacion.nivelPicante,
+        tipoArroz: personalizacion.tipoArroz === 'blanco' ? 'Arroz blanco' : 'Arroz integral',
+        notasChef: personalizacion.notasChef
+      }
+    };
+    addToCart(productoPersonalizado, cantidad);
+  };
+
+  // Obtener emoji según nivel de picante
+  const getPicanteEmoji = (nivel) => {
+    if (nivel === 0) return '🌶️  Sin picante';
+    if (nivel <= 2) return '🌶️  Suave';
+    if (nivel <= 4) return '🌶️🌶️  Medio';
+    return '🌶️🌶️🌶️  Picante';
   };
 
   if (loading) {
@@ -61,7 +101,7 @@ const ProductoDetalle = () => {
     return (
       <div className={styles.notFound}>
         <h2>{error}</h2>
-        <button onClick={() => navigate('/menu')} className={styles.backButton}>
+        <button onClick={() => navigate('/menu')} className={styles.backButtonLarge}>
           Volver al menú
         </button>
       </div>
@@ -72,7 +112,7 @@ const ProductoDetalle = () => {
     return (
       <div className={styles.notFound}>
         <h2>Producto no encontrado</h2>
-        <button onClick={() => navigate('/menu')} className={styles.backButton}>
+        <button onClick={() => navigate('/menu')} className={styles.backButtonLarge}>
           Volver al menú
         </button>
       </div>
@@ -114,14 +154,67 @@ const ProductoDetalle = () => {
             <p>{producto.descripcion}</p>
           </div>
 
-          <div className={styles.section}>
-            <h3>Origen</h3>
-            <p>{producto.origen}</p>
-          </div>
+          {/* Personalización del plato */}
+          <div className={styles.personalizacionSection}>
+            <h3>Personaliza tu plato</h3>
+            
+            {/* Nivel de picante - Control Drag */}
+            <div className={styles.picanteControl}>
+              <label>🌶️ Nivel de picante</label>
+              <div className={styles.sliderContainer}>
+                <input
+                  type="range"
+                  min="0"
+                  max="5"
+                  step="1"
+                  value={personalizacion.nivelPicante}
+                  onChange={handleNivelPicanteChange}
+                  className={styles.slider}
+                />
+                <div className={styles.picanteLabels}>
+                  <span>Sin</span>
+                  <span>Suave</span>
+                  <span>Medio</span>
+                  <span>Picante</span>
+                  <span>Muy</span>
+                  <span>🔥</span>
+                </div>
+                <div className={styles.picanteValue}>
+                  {getPicanteEmoji(personalizacion.nivelPicante)}
+                </div>
+              </div>
+            </div>
 
-          <div className={styles.section}>
-            <h3>Notas de cata</h3>
-            <p>{producto.notasCata}</p>
+            {/* Selector de tipo de arroz */}
+            <div className={styles.arrozControl}>
+              <label>🍚 Tipo de arroz</label>
+              <div className={styles.arrozOptions}>
+                <button
+                  className={`${styles.arrozBtn} ${personalizacion.tipoArroz === 'blanco' ? styles.arrozBtnActive : ''}`}
+                  onClick={() => setPersonalizacion({...personalizacion, tipoArroz: 'blanco'})}
+                >
+                  Arroz blanco
+                </button>
+                <button
+                  className={`${styles.arrozBtn} ${personalizacion.tipoArroz === 'integral' ? styles.arrozBtnActive : ''}`}
+                  onClick={() => setPersonalizacion({...personalizacion, tipoArroz: 'integral'})}
+                >
+                  Arroz integral
+                </button>
+              </div>
+            </div>
+
+            {/* Campo de notas para el chef */}
+            <div className={styles.notasControl}>
+              <label>📝 Notas para el chef</label>
+              <textarea
+                value={personalizacion.notasChef}
+                onChange={handleNotasChefChange}
+                placeholder="Ej: Sin wasabi, extra salsa, sin gluten, más picante..."
+                rows="3"
+                className={styles.notasTextarea}
+              />
+            </div>
           </div>
 
           <div className={styles.section}>
