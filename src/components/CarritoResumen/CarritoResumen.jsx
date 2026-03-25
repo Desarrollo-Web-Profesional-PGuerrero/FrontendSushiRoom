@@ -28,6 +28,16 @@ const CarritoResumen = () => {
     setItemToDelete(null);
   };
 
+  // Función para obtener el texto del nivel de picante
+  const getPicanteTexto = (nivel) => {
+    if (nivel === 0) return 'Sin picante';
+    if (nivel === 1) return '🌶️ Suave';
+    if (nivel === 2) return '🌶️🌶️ Medio bajo';
+    if (nivel === 3) return '🌶️🌶️🌶️ Medio';
+    if (nivel === 4) return '🌶️🌶️🌶️🌶️ Picante';
+    return '🌶️🌶️🌶️🌶️🌶️ Muy picante';
+  };
+
   if (cart.length === 0) {
     return (
       <div className={styles.carritoVacio}>
@@ -80,6 +90,28 @@ const CarritoResumen = () => {
               
               <div className={styles.info}>
                 <h3>{item.nombre}</h3>
+                
+                {/* Mostrar personalizaciones si existen */}
+                {item.personalizacion && (
+                  <div className={styles.personalizacionInfo}>
+                    {item.personalizacion.nivelPicante !== undefined && item.personalizacion.nivelPicante > 0 && (
+                      <span className={styles.badgePicante}>
+                        {getPicanteTexto(item.personalizacion.nivelPicante)}
+                      </span>
+                    )}
+                    {item.personalizacion.tipoArroz && item.personalizacion.tipoArroz !== 'Arroz blanco' && (
+                      <span className={styles.badgeArroz}>
+                        🍚 {item.personalizacion.tipoArroz}
+                      </span>
+                    )}
+                    {item.personalizacion.notasChef && (
+                      <span className={styles.badgeNota}>
+                        📝 Nota: {item.personalizacion.notasChef}
+                      </span>
+                    )}
+                  </div>
+                )}
+                
                 <p className={styles.precio}>${item.precio} MXN c/u</p>
               </div>
               
@@ -96,7 +128,7 @@ const CarritoResumen = () => {
                 >+</button>
               </div>
               
-              <p className={styles.subtotal}>${item.precio * item.quantity} MXN</p>
+              <p className={styles.subtotal}>${(item.precio * item.quantity).toFixed(2)} MXN</p>
               
               <button 
                 onClick={() => handleEliminarClick(item)}
@@ -111,7 +143,7 @@ const CarritoResumen = () => {
         <div className={styles.footer}>
           <div className={styles.total}>
             <span>Total a pagar:</span>
-            <span className={styles.totalMonto}>${getCartTotal()} MXN</span>
+            <span className={styles.totalMonto}>${getCartTotal().toFixed(2)} MXN</span>
           </div>
           
           <button 
