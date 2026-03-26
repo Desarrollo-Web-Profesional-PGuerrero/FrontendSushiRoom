@@ -10,7 +10,7 @@
 body {
   margin: 0;
   padding: 0;
-  background: linear-gradient(135deg, var(--verde-oscuro) 0%, #035a2e 100%);
+  background: linear-gradient(135deg, var(--verde-oscuro) 0%, #064224 100%);
   min-height: 100vh;
 }
 
@@ -44,7 +44,7 @@ body {
   margin-bottom: 2rem;
   text-align: center;
   font-family: 'Cormorant Garamond', serif;
-  text-shadow: 0 4px 8px rgba(2, 56, 32, 0.5), 2px 2px 0 var(--rojo);
+  text-shadow: 0 4px 8px rgba(6, 39, 10, 0.5), 2px 2px 0 var(--rojo);
   letter-spacing: 2px;
   position: relative;
   z-index: 1;
@@ -365,4 +365,91 @@ body {
 
 .vacio p {
   color: #666;
+}
+
+.recommendationBanner {
+  background: linear-gradient(135deg, gold, #ffd700);
+  color: #1a1a1a;
+  padding: 12px 24px;
+  text-align: center;
+  font-weight: bold;
+  animation: slideDown 0.5s ease;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+/* Filtros */
+.filtersContainer {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.filterBtn {
+  padding: 10px 24px;
+  background: #3a3a3a;
+  border: 2px solid #555;
+  border-radius: 50px;
+  color: #e0e0e0;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.filterBtn:hover {
+  border-color: gold;
+  transform: translateY(-2px);
+}
+
+.filterActive {
+  background: gold;
+  color: #1a1a1a;
+  border-color: gold;
+  font-weight: bold;
+}
+
+/* Sin resultados */
+.noResults {
+  text-align: center;
+  padding: 60px 20px;
+  background: #2a2a2a;
+  border-radius: 16px;
+  margin: 40px auto;
+  max-width: 500px;
+}
+
+.noResults p {
+  color: #e0e0e0;
+  font-size: 18px;
+  margin-bottom: 24px;
+}
+
+.btnVerTodos {
+  padding: 12px 24px;
+  background: gold;
+  color: #1a1a1a;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.btnVerTodos:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
 }
