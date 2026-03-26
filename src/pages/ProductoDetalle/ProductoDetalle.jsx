@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useCarrito } from '../../hooks/useCarrito';
 import styles from './ProductoDetalle.module.css';
 
 // Datos mock con la información requerida
@@ -69,9 +70,11 @@ const productosMock = [
 const ProductoDetalle = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { agregarAlCarrito } = useCarrito(); // Hook del carrito
   const [producto, setProducto] = useState(null);
   const [loading, setLoading] = useState(true);
   const [cantidad, setCantidad] = useState(1);
+  const [mensaje, setMensaje] = useState(null); // Estado para el mensaje de confirmación
 
   useEffect(() => {
     // Simulamos carga de datos
@@ -83,13 +86,16 @@ const ProductoDetalle = () => {
   }, [id]);
 
   const handleAgregarCarrito = () => {
-    // Aquí iría la lógica para agregar al carrito
-    console.log('Agregando al carrito:', {
-      ...producto,
-      cantidad
-    });
-    // Mostrar mensaje de éxito o redirigir
-    alert(`${producto.nombre} agregado al carrito (${cantidad} unidad(es))`);
+    // Agregar al carrito usando el contexto
+    agregarAlCarrito(producto, cantidad);
+    
+    // Mostrar mensaje de éxito
+    setMensaje(`${producto.nombre} agregado al carrito (${cantidad} unidad(es))`);
+    
+    // Ocultar el mensaje después de 3 segundos
+    setTimeout(() => {
+      setMensaje(null);
+    }, 3000);
   };
 
   if (loading) {
@@ -112,6 +118,13 @@ const ProductoDetalle = () => {
       <button onClick={() => navigate(-1)} className={styles.backButton}>
         ← Volver
       </button>
+
+      {/* Mensaje de confirmación */}
+      {mensaje && (
+        <div className={styles.mensajeConfirmacion}>
+          {mensaje}
+        </div>
+      )}
 
       <div className={styles.content}>
         <div className={styles.imageSection}>
