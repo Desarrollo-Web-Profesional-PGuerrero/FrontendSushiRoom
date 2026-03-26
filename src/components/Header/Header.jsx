@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useCarrito } from '../../context/CarritoContext';
+import { useCarrito } from '../../hooks/useCarrito';
 import styles from './Header.module.css';
 
 const Header = () => {

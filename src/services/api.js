@@ -1,5 +1,6 @@
 // src/services/api.js
-const API_URL = 'http://localhost:8080/api'; // Spring Boot corre en puerto 8080
+// Usa la variable de entorno, o fallback a localhost para desarrollo
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
 export const getProductos = async () => {
   try {
