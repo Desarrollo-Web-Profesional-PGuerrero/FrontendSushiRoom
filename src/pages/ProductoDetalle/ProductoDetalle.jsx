@@ -1,95 +1,97 @@
+// src/pages/ProductoDetalle/ProductoDetalle.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCarrito } from '../../hooks/useCarrito';
+import { useCart } from '../../context/CarritoContext';
+import { getProductoById } from '../../services/api';
 import styles from './ProductoDetalle.module.css';
-
-// Datos mock con la información requerida
-const productosMock = [
-  { 
-    id: 1, 
-    nombre: 'Salmón Nigiri', 
-    precio: 105, 
-    imagen: '/src/assets/images/salmon.jpg',
-    descripcion: 'Delicioso corte de salmón fresco sobre arroz avinagrado, preparado al momento.',
-    origen: 'Salmón proveniente de aguas frías de Noruega, criado de manera sostenible.',
-    notasCata: 'Textura suave y mantecosa, con un sabor limpio y fresco. El arroz está perfectamente sazonado con vinagre de arroz japonés.',
-    ingredientes: ['Salmón fresco', 'Arroz para sushi', 'Vinagre de arroz', 'Azúcar', 'Sal', 'Alga nori (opcional)']
-  },
-  { 
-    id: 2, 
-    nombre: 'Atún Nigiri', 
-    precio: 115, 
-    imagen: '/src/assets/images/tuna.jpg',
-    descripcion: 'Corte de atún rojo de primera calidad sobre una base de arroz sazonado.',
-    origen: 'Atún rojo capturado en el Mediterráneo, seleccionado por su calidad y frescura.',
-    notasCata: 'Sabor intenso y característico, con una textura firme pero tierna. Cada bocado se deshace en la boca.',
-    ingredientes: ['Atún rojo', 'Arroz para sushi', 'Vinagre de arroz', 'Wasabi', 'Jengibre encurtido']
-  },
-  { 
-    id: 3, 
-    nombre: 'Roll California', 
-    precio: 125, 
-    imagen: '/src/assets/images/california.png',
-    descripcion: 'El clásico rollo californiano con pepino, aguacate y cangrejo, envuelto en ajonjolí.',
-    origen: 'Receta inspirada en la fusión japonesa-californiana, adaptada con ingredientes locales frescos.',
-    notasCata: 'Textura crujiente por el ajonjolí tostado, combinado con la suavidad del aguacate y la frescura del pepino.',
-    ingredientes: ['Alga nori', 'Arroz', 'Pepino', 'Aguacate', 'Surimi', 'Ajonjolí tostado']
-  },
-  { 
-    id: 4, 
-    nombre: 'Roll Spicy Tuna', 
-    precio: 130, 
-    imagen: '/src/assets/images/spicy.jpg',
-    descripcion: 'Rollo de atún picante con un toque de mayonesa japonesa y salsa sriracha.',
-    origen: 'Especialidad de la casa, creada para los amantes del picante con ingredientes frescos.',
-    notasCata: 'El picante equilibrado resalta el sabor del atún, creando una experiencia intensa y sabrosa.',
-    ingredientes: ['Atún', 'Arroz', 'Salsa picante', 'Mayonesa japonesa', 'Cebollín', 'Alga nori']
-  },
-  { 
-    id: 5, 
-    nombre: 'Sashimi Salmón', 
-    precio: 120, 
-    imagen: '/src/assets/images/sashimi.png',
-    descripcion: 'Finas láminas de salmón fresco servidas con daikon y salsa de soya.',
-    origen: 'Preparación tradicional japonesa que resalta la calidad del pescado, con salmón noruego.',
-    notasCata: 'La frescura del salmón es la protagonista, con una textura aterciopelada que se derrite en el paladar.',
-    ingredientes: ['Salmón fresco', 'Daikon rallado', 'Salsa de soya', 'Wasabi', 'Jengibre']
-  },
-  { 
-    id: 6, 
-    nombre: 'Ebi Roll', 
-    precio: 110, 
-    imagen: '/src/assets/images/ebi.jpg',
-    descripcion: 'Rollo de camarón tempurizado con aguacate y salsa de anguila.',
-    origen: 'Fusión de técnicas japonesas con camarón fresco del Golfo de México.',
-    notasCata: 'El contraste entre el camarón crujiente y la suavidad del aguacate es espectacular, con un toque dulce de la salsa.',
-    ingredientes: ['Camarón', 'Tempura', 'Aguacate', 'Salsa de anguila', 'Arroz', 'Alga nori']
-  }
-];
 
 const ProductoDetalle = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { agregarAlCarrito } = useCarrito(); // Hook del carrito
+  const { agregarAlCarrito } = useCarrito(); // Hook del carrito (rama gerardo)
   const [producto, setProducto] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [cantidad, setCantidad] = useState(1);
-  const [mensaje, setMensaje] = useState(null); // Estado para el mensaje de confirmación
+  const [mensaje, setMensaje] = useState(null); // Estado para el mensaje de confirmación (rama gerardo)
+  const [personalizacion, setPersonalizacion] = useState({
+    nivelPicante: 0,
+    tipoArroz: 'blanco',
+    notasChef: ''
+  });
+  const { addToCart, notification } = useCart(); // Hook del carrito (rama main)
 
   useEffect(() => {
-    // Simulamos carga de datos
-    setTimeout(() => {
-      const productoEncontrado = productosMock.find(p => p.id === parseInt(id));
-      setProducto(productoEncontrado || null);
-      setLoading(false);
-    }, 100);
+    cargarProducto();
   }, [id]);
 
+  const cargarProducto = async () => {
+    try {
+      setLoading(true);
+      const data = await getProductoById(id);
+      
+      if (data) {
+        const productoFormateado = {
+          id: data.id,
+          nombre: data.nombre,
+          precio: parseFloat(data.precio),
+          imagen: data.imagenUrl || '/images/default.jpg',
+          descripcion: data.descripcion || 'Delicioso platillo de nuestra cocina',
+          origen: data.origen || 'Preparado con los mejores ingredientes',
+          notasCata: data.notasCata || 'Sabor excepcional que deleitará tu paladar',
+          ingredientes: data.ingredientes || ['Arroz', 'Alga nori', 'Pescado fresco']
+        };
+        setProducto(productoFormateado);
+        setError(null);
+      } else {
+        setError('Producto no encontrado');
+      }
+    } catch (err) {
+      console.error('Error al cargar producto:', err);
+      setError('No se pudo cargar el producto');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleNivelPicanteChange = (e) => {
+    setPersonalizacion({
+      ...personalizacion,
+      nivelPicante: parseInt(e.target.value)
+    });
+  };
+
+  const handleTipoArrozChange = (e) => {
+    setPersonalizacion({
+      ...personalizacion,
+      tipoArroz: e.target.value
+    });
+  };
+
+  const handleNotasChefChange = (e) => {
+    setPersonalizacion({
+      ...personalizacion,
+      notasChef: e.target.value
+    });
+  };
+
   const handleAgregarCarrito = () => {
-    // Agregar al carrito usando el contexto
+    // Agregar al carrito usando el contexto de gerardo
     agregarAlCarrito(producto, cantidad);
     
-    // Mostrar mensaje de éxito
+    // Agregar al carrito usando el contexto de main con personalización
+    const productoPersonalizado = {
+      ...producto,
+      personalizacion: {
+        nivelPicante: personalizacion.nivelPicante,
+        tipoArroz: personalizacion.tipoArroz === 'blanco' ? 'Arroz blanco' : 'Arroz integral',
+        notasChef: personalizacion.notasChef
+      }
+    };
+    addToCart(productoPersonalizado, cantidad);
+    
+    // Mostrar mensaje de éxito (rama gerardo)
     setMensaje(`${producto.nombre} agregado al carrito (${cantidad} unidad(es))`);
     
     // Ocultar el mensaje después de 3 segundos
@@ -98,15 +100,34 @@ const ProductoDetalle = () => {
     }, 3000);
   };
 
+  // Obtener emoji según nivel de picante (rama main)
+  const getPicanteEmoji = (nivel) => {
+    if (nivel === 0) return '🌶️  Sin picante';
+    if (nivel <= 2) return '🌶️  Suave';
+    if (nivel <= 4) return '🌶️🌶️  Medio';
+    return '🌶️🌶️🌶️  Picante';
+  };
+
   if (loading) {
     return <div className={styles.loading}>Cargando producto...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className={styles.notFound}>
+        <h2>{error}</h2>
+        <button onClick={() => navigate('/menu')} className={styles.backButtonLarge}>
+          Volver al menú
+        </button>
+      </div>
+    );
   }
 
   if (!producto) {
     return (
       <div className={styles.notFound}>
         <h2>Producto no encontrado</h2>
-        <button onClick={() => navigate('/menu')} className={styles.backButton}>
+        <button onClick={() => navigate('/menu')} className={styles.backButtonLarge}>
           Volver al menú
         </button>
       </div>
@@ -115,11 +136,19 @@ const ProductoDetalle = () => {
 
   return (
     <div className={styles.container}>
+      {/* Notificación flotante de main */}
+      {notification.show && (
+        <div className={`${styles.notification} ${styles.notificationShow}`}>
+          <span className={styles.notificationIcon}>✓</span>
+          {notification.message}
+        </div>
+      )}
+
       <button onClick={() => navigate(-1)} className={styles.backButton}>
         ← Volver
       </button>
 
-      {/* Mensaje de confirmación */}
+      {/* Mensaje de confirmación de gerardo */}
       {mensaje && (
         <div className={styles.mensajeConfirmacion}>
           {mensaje}
@@ -128,34 +157,98 @@ const ProductoDetalle = () => {
 
       <div className={styles.content}>
         <div className={styles.imageSection}>
-          <img src={producto.imagen} alt={producto.nombre} className={styles.image} />
+          <img 
+            src={producto.imagen} 
+            alt={producto.nombre} 
+            className={styles.image}
+            onError={(e) => {
+              e.target.src = '/images/default.jpg';
+            }}
+          />
         </div>
 
         <div className={styles.infoSection}>
           <h1 className={styles.nombre}>{producto.nombre}</h1>
-          <p className={styles.precio}>${producto.precio} MXN</p>
+          <p className={styles.precio}>${producto.precio.toFixed(2)} MXN</p>
 
           <div className={styles.section}>
             <h3>Descripción</h3>
             <p>{producto.descripcion}</p>
           </div>
 
-          <div className={styles.section}>
-            <h3>Origen</h3>
-            <p>{producto.origen}</p>
-          </div>
+          {/* Personalización del plato - Rama main */}
+          <div className={styles.personalizacionSection}>
+            <h3>Personaliza tu plato</h3>
+            
+            {/* Nivel de picante - Control Drag */}
+            <div className={styles.picanteControl}>
+              <label>🌶️ Nivel de picante</label>
+              <div className={styles.sliderContainer}>
+                <input
+                  type="range"
+                  min="0"
+                  max="5"
+                  step="1"
+                  value={personalizacion.nivelPicante}
+                  onChange={handleNivelPicanteChange}
+                  className={styles.slider}
+                />
+                <div className={styles.picanteLabels}>
+                  <span>Sin</span>
+                  <span>Suave</span>
+                  <span>Medio</span>
+                  <span>Picante</span>
+                  <span>Muy</span>
+                  <span>🔥</span>
+                </div>
+                <div className={styles.picanteValue}>
+                  {getPicanteEmoji(personalizacion.nivelPicante)}
+                </div>
+              </div>
+            </div>
 
-          <div className={styles.section}>
-            <h3>Notas de cata</h3>
-            <p>{producto.notasCata}</p>
+            {/* Selector de tipo de arroz */}
+            <div className={styles.arrozControl}>
+              <label>🍚 Tipo de arroz</label>
+              <div className={styles.arrozOptions}>
+                <button
+                  className={`${styles.arrozBtn} ${personalizacion.tipoArroz === 'blanco' ? styles.arrozBtnActive : ''}`}
+                  onClick={() => setPersonalizacion({...personalizacion, tipoArroz: 'blanco'})}
+                >
+                  Arroz blanco
+                </button>
+                <button
+                  className={`${styles.arrozBtn} ${personalizacion.tipoArroz === 'integral' ? styles.arrozBtnActive : ''}`}
+                  onClick={() => setPersonalizacion({...personalizacion, tipoArroz: 'integral'})}
+                >
+                  Arroz integral
+                </button>
+              </div>
+            </div>
+
+            {/* Campo de notas para el chef */}
+            <div className={styles.notasControl}>
+              <label>📝 Notas para el chef</label>
+              <textarea
+                value={personalizacion.notasChef}
+                onChange={handleNotasChefChange}
+                placeholder="Ej: Sin wasabi, extra salsa, sin gluten, más picante..."
+                rows="3"
+                className={styles.notasTextarea}
+              />
+            </div>
           </div>
 
           <div className={styles.section}>
             <h3>Ingredientes</h3>
             <ul className={styles.ingredientesList}>
-              {producto.ingredientes.map((ingrediente, index) => (
-                <li key={index}>{ingrediente}</li>
-              ))}
+              {Array.isArray(producto.ingredientes) ? (
+                producto.ingredientes.map((ingrediente, index) => (
+                  <li key={index}>{ingrediente}</li>
+                ))
+              ) : (
+                <li>Información de ingredientes no disponible</li>
+              )}
             </ul>
           </div>
 
@@ -179,7 +272,7 @@ const ProductoDetalle = () => {
               onClick={handleAgregarCarrito}
               className={styles.agregarBtn}
             >
-              Agregar al carrito - ${producto.precio * cantidad} MXN
+              Agregar al carrito - ${(producto.precio * cantidad).toFixed(2)} MXN
             </button>
           </div>
         </div>
