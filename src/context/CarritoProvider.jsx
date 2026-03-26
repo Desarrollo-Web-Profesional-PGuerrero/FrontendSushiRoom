@@ -1,30 +1,76 @@
-import React, { useState } from 'react';
-import { CarritoContext } from './CarritoContext';
+// src/context/CarritoProvider.jsx
+import React, { useState, useEffect } from "react";
+import { CarritoContext } from "./CarritoContext";
 
 export const CarritoProvider = ({ children }) => {
   const [carrito, setCarrito] = useState([]);
+  const [notification, setNotification] = useState({
+    show: false,
+    message: "",
+  });
 
-  const totalItems = carrito.reduce((sum, item) => sum + item.cantidad, 0);
-  const totalPrecio = carrito.reduce((sum, item) => sum + (item.precio * item.cantidad), 0);
+  // Cargar carrito desde localStorage al iniciar
+  useEffect(() => {
+    const savedCart = localStorage.getItem("carrito");
+    if (savedCart) {
+      try {
+        setCarrito(JSON.parse(savedCart));
+      } catch (e) {
+        console.error("Error al cargar carrito:", e);
+        setCarrito([]);
+      }
+    }
+  }, []);
+
+  // Guardar carrito en localStorage cuando cambie
+  useEffect(() => {
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+  }, [carrito]);
+
+  // Mostrar notificación temporal
+  const showNotification = (message) => {
+    setNotification({ show: true, message });
+    setTimeout(() => {
+      setNotification({ show: false, message: "" });
+    }, 2000);
+  };
+
+  // Calcular total de items
+  const totalItems = carrito.reduce(
+    (sum, item) => sum + (item.cantidad || 0),
+    0,
+  );
+
+  // Calcular precio total
+  const totalPrecio = carrito.reduce(
+    (sum, item) => sum + (item.precio || 0) * (item.cantidad || 0),
+    0,
+  );
 
   const agregarAlCarrito = (producto, cantidad = 1) => {
-    setCarrito(prevCarrito => {
-      const existe = prevCarrito.find(item => item.id === producto.id);
-      
+    setCarrito((prevCarrito) => {
+      const existe = prevCarrito.find((item) => item.id === producto.id);
+
       if (existe) {
-        return prevCarrito.map(item =>
+        const nuevoCarrito = prevCarrito.map((item) =>
           item.id === producto.id
-            ? { ...item, cantidad: item.cantidad + cantidad }
-            : item
+            ? { ...item, cantidad: (item.cantidad || 0) + cantidad }
+            : item,
         );
+        showNotification(`+${cantidad} ${producto.nombre} agregado`);
+        return nuevoCarrito;
       }
-      
+
+      showNotification(`${producto.nombre} agregado al carrito`);
       return [...prevCarrito, { ...producto, cantidad }];
     });
   };
 
   const eliminarDelCarrito = (productoId) => {
-    setCarrito(prevCarrito => prevCarrito.filter(item => item.id !== productoId));
+    setCarrito((prevCarrito) =>
+      prevCarrito.filter((item) => item.id !== productoId),
+    );
+    showNotification("Producto eliminado del carrito");
   };
 
   const actualizarCantidad = (productoId, nuevaCantidad) => {
@@ -32,18 +78,17 @@ export const CarritoProvider = ({ children }) => {
       eliminarDelCarrito(productoId);
       return;
     }
-    
-    setCarrito(prevCarrito =>
-      prevCarrito.map(item =>
-        item.id === productoId
-          ? { ...item, cantidad: nuevaCantidad }
-          : item
-      )
+
+    setCarrito((prevCarrito) =>
+      prevCarrito.map((item) =>
+        item.id === productoId ? { ...item, cantidad: nuevaCantidad } : item,
+      ),
     );
   };
 
   const vaciarCarrito = () => {
     setCarrito([]);
+    showNotification("Carrito vaciado");
   };
 
   const value = {
@@ -53,12 +98,11 @@ export const CarritoProvider = ({ children }) => {
     agregarAlCarrito,
     eliminarDelCarrito,
     actualizarCantidad,
-    vaciarCarrito
+    vaciarCarrito,
+    notification,
   };
 
   return (
-    <CarritoContext.Provider value={value}>
-      {children}
-    </CarritoContext.Provider>
+    <CarritoContext.Provider value={value}>{children}</CarritoContext.Provider>
   );
 };
