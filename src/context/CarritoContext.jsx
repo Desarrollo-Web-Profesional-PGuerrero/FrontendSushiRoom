@@ -1,8 +1,10 @@
 // src/context/CarritoContext.jsx
 import React, { createContext, useState, useContext, useEffect } from 'react';
 
-const CarritoContext = createContext();
+// Crear el contexto (versión mejorada de main)
+const CarritoContext = createContext(null);
 
+// Hook personalizado para usar el carrito (de main)
 export const useCart = () => {
   const context = useContext(CarritoContext);
   if (!context) {
@@ -11,6 +13,10 @@ export const useCart = () => {
   return context;
 };
 
+// Exportar el contexto para uso directo (de gerardo, por compatibilidad)
+export { CarritoContext };
+
+// Provider principal (de main, con funcionalidad completa)
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const [notification, setNotification] = useState({ show: false, message: '', product: null });

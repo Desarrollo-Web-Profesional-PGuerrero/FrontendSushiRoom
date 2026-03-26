@@ -1,0 +1,206 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.backButton {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  color: #b22222;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  transition: color 0.3s;
+  font-family: inherit;
+}
+
+.backButton:hover {
+  color: #8b0000;
+  text-decoration: underline;
+}
+
+.title {
+  font-size: 2rem;
+  color: #0a0a0a;
+  margin: 0;
+  font-family: 'Cormorant Garamond', serif;
+}
+
+.content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.infoPedido {
+  background: #f9f9f9;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.infoCard {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.infoRow {
+  display: flex;
+  gap: 0.5rem;
+  font-size: 1rem;
+}
+
+.label {
+  font-weight: 600;
+  color: #666;
+}
+
+.value {
+  color: #0a0a0a;
+  font-weight: 500;
+}
+
+.timelineSection {
+  padding: 2rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.timelineSection h2 {
+  font-size: 1.5rem;
+  color: #0a0a0a;
+  margin-bottom: 1.5rem;
+  font-family: 'Cormorant Garamond', serif;
+}
+
+.resumenSection {
+  padding: 2rem;
+}
+
+.resumenSection h2 {
+  font-size: 1.5rem;
+  color: #0a0a0a;
+  margin-bottom: 1.5rem;
+  font-family: 'Cormorant Garamond', serif;
+}
+
+.itemsList {
+  margin-bottom: 1.5rem;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.itemInfo {
+  display: flex;
+  gap: 1rem;
+  align-items: baseline;
+}
+
+.itemCantidad {
+  font-weight: 600;
+  color: #b22222;
+  min-width: 40px;
+}
+
+.itemNombre {
+  color: #0a0a0a;
+}
+
+.itemPrecio {
+  font-weight: 500;
+  color: #0a0a0a;
+}
+
+.total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  border-top: 2px solid #e0e0e0;
+}
+
+.totalMonto {
+  color: #b22222;
+  font-size: 1.3rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 4rem;
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.error {
+  text-align: center;
+  padding: 4rem;
+}
+
+.error h2 {
+  color: #b22222;
+  margin-bottom: 1rem;
+}
+
+.button {
+  background: #b22222;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.3s;
+}
+
+.button:hover {
+  background: #8b0000;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .header {
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .title {
+    font-size: 1.5rem;
+  }
+  
+  .timelineSection,
+  .resumenSection {
+    padding: 1.5rem;
+  }
+  
+  .infoCard {
+    gap: 1rem;
+    flex-direction: column;
+  }
+  
+  .item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}

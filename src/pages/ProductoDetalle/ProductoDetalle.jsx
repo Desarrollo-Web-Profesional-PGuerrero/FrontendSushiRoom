@@ -1,6 +1,7 @@
 // src/pages/ProductoDetalle/ProductoDetalle.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useCarrito } from '../../hooks/useCarrito';
 import { useCart } from '../../context/CarritoContext';
 import { getProductoById } from '../../services/api';
 import styles from './ProductoDetalle.module.css';
@@ -8,16 +9,18 @@ import styles from './ProductoDetalle.module.css';
 const ProductoDetalle = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { agregarAlCarrito } = useCarrito(); // Hook del carrito (rama gerardo)
   const [producto, setProducto] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [cantidad, setCantidad] = useState(1);
+  const [mensaje, setMensaje] = useState(null); // Estado para el mensaje de confirmación (rama gerardo)
   const [personalizacion, setPersonalizacion] = useState({
     nivelPicante: 0,
     tipoArroz: 'blanco',
     notasChef: ''
   });
-  const { addToCart, notification } = useCart();
+  const { addToCart, notification } = useCart(); // Hook del carrito (rama main)
 
   useEffect(() => {
     cargarProducto();
@@ -74,6 +77,10 @@ const ProductoDetalle = () => {
   };
 
   const handleAgregarCarrito = () => {
+    // Agregar al carrito usando el contexto de gerardo
+    agregarAlCarrito(producto, cantidad);
+    
+    // Agregar al carrito usando el contexto de main con personalización
     const productoPersonalizado = {
       ...producto,
       personalizacion: {
@@ -83,9 +90,17 @@ const ProductoDetalle = () => {
       }
     };
     addToCart(productoPersonalizado, cantidad);
+    
+    // Mostrar mensaje de éxito (rama gerardo)
+    setMensaje(`${producto.nombre} agregado al carrito (${cantidad} unidad(es))`);
+    
+    // Ocultar el mensaje después de 3 segundos
+    setTimeout(() => {
+      setMensaje(null);
+    }, 3000);
   };
 
-  // Obtener emoji según nivel de picante
+  // Obtener emoji según nivel de picante (rama main)
   const getPicanteEmoji = (nivel) => {
     if (nivel === 0) return '🌶️  Sin picante';
     if (nivel <= 2) return '🌶️  Suave';
@@ -121,7 +136,7 @@ const ProductoDetalle = () => {
 
   return (
     <div className={styles.container}>
-      {/* Notificación flotante */}
+      {/* Notificación flotante de main */}
       {notification.show && (
         <div className={`${styles.notification} ${styles.notificationShow}`}>
           <span className={styles.notificationIcon}>✓</span>
@@ -132,6 +147,13 @@ const ProductoDetalle = () => {
       <button onClick={() => navigate(-1)} className={styles.backButton}>
         ← Volver
       </button>
+
+      {/* Mensaje de confirmación de gerardo */}
+      {mensaje && (
+        <div className={styles.mensajeConfirmacion}>
+          {mensaje}
+        </div>
+      )}
 
       <div className={styles.content}>
         <div className={styles.imageSection}>
@@ -154,7 +176,7 @@ const ProductoDetalle = () => {
             <p>{producto.descripcion}</p>
           </div>
 
-          {/* Personalización del plato */}
+          {/* Personalización del plato - Rama main */}
           <div className={styles.personalizacionSection}>
             <h3>Personaliza tu plato</h3>
             
