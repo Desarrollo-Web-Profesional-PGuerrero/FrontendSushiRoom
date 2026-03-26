@@ -1,16 +1,16 @@
 // src/pages/Menu/Menu.jsx
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { useCart } from '../../context/CarritoContext';
-import { getProductos } from '../../services/api';
-import styles from './Menu.module.css';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { useCarrito } from "../../hooks/useCarrito";
+import { getProductos } from "../../services/api";
+import styles from "./Menu.module.css";
 
 const Menu = () => {
   const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [addingProduct, setAddingProduct] = useState(null);
-  const { addToCart, notification } = useCart();
+  const { agregarAlCarrito, notification } = useCarrito();
 
   useEffect(() => {
     cargarProductos();
@@ -20,26 +20,24 @@ const Menu = () => {
     try {
       setLoading(true);
       const data = await getProductos();
-      
-      console.log('Datos recibidos del backend:', data);
-      
-      // Transformar los datos al formato que usa el frontend
-      const productosFormateados = data.map(producto => ({
+
+      console.log("Datos recibidos del backend:", data);
+
+      const productosFormateados = data.map((producto) => ({
         id: producto.id,
         nombre: producto.nombre,
         precio: parseFloat(producto.precio),
-        // Usar directamente la imagenUrl que viene de la base de datos
-        imagen: producto.imagenUrl || '/images/default.jpg', // Si no tiene imagen, usa default
+        imagen: producto.imagenUrl || "/images/default.jpg",
         descripcion: producto.descripcion,
         origen: producto.origen,
-        notasCata: producto.notasCata
+        notasCata: producto.notasCata,
       }));
-      
+
       setProductos(productosFormateados);
       setError(null);
     } catch (err) {
-      console.error('Error al cargar productos:', err);
-      setError('No se pudieron cargar los productos');
+      console.error("Error al cargar productos:", err);
+      setError("No se pudieron cargar los productos");
     } finally {
       setLoading(false);
     }
@@ -48,7 +46,7 @@ const Menu = () => {
   const handleAddToCart = (producto) => {
     setAddingProduct(producto.id);
     setTimeout(() => setAddingProduct(null), 500);
-    addToCart(producto, 1);
+    agregarAlCarrito(producto, 1);
   };
 
   if (loading) {
@@ -83,35 +81,37 @@ const Menu = () => {
 
   return (
     <div className={styles.menu}>
-      {notification.show && (
+      {notification?.show && (
         <div className={`${styles.notification} ${styles.notificationShow}`}>
           <span className={styles.notificationIcon}>✓</span>
           {notification.message}
         </div>
       )}
-      
+
       <h1>Nuestro Menú</h1>
       <div className={styles.grid}>
-        {productos.map(producto => (
+        {productos.map((producto) => (
           <div key={producto.id} className={styles.card}>
             <Link to={`/producto/${producto.id}`} className={styles.cardLink}>
               <div className={styles.imageContainer}>
-                <img 
-                  src={producto.imagen} 
+                <img
+                  src={producto.imagen}
                   alt={producto.nombre}
                   onError={(e) => {
-                    e.target.src = '/images/default.jpg';
+                    e.target.src = "/images/default.jpg";
                   }}
                 />
               </div>
               <h3>{producto.nombre}</h3>
               <p className={styles.precio}>${producto.precio.toFixed(2)} MXN</p>
             </Link>
-            <button 
-              className={`${styles.btnAgregar} ${addingProduct === producto.id ? styles.btnAgregando : ''}`}
+            <button
+              className={`${styles.btnAgregar} ${addingProduct === producto.id ? styles.btnAgregando : ""}`}
               onClick={() => handleAddToCart(producto)}
             >
-              {addingProduct === producto.id ? '✓ Agregado!' : '+ Agregar al carrito'}
+              {addingProduct === producto.id
+                ? "✓ Agregado!"
+                : "+ Agregar al carrito"}
             </button>
           </div>
         ))}
