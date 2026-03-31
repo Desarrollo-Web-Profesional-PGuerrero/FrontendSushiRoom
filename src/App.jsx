@@ -17,6 +17,7 @@ import AdminPanel from "./pages/Admin/AdminPanel";
 import Header from "./components/Header/Header";
 import Footer from "./components/Footer/Footer";
 import CartIcon from "./components/CartIcon/CartIcon";
+import ConfirmacionPedido from './pages/ConfirmacionPedido/ConfirmacionPedido';
 import "./App.css";
 
 function App() {
@@ -35,8 +36,9 @@ function App() {
                   <Route path="/experiencia" element={<Experiencia />} />
                   <Route path="/producto/:id" element={<ProductoDetalle />} />
                   <Route path="/carrito" element={<Carrito />} />
-                  <Route path="/estado-pedido/:id" element={<EstadoPedido />} />
                   <Route path="/checkout" element={<Checkout />} />
+                  <Route path="/confirmacion" element={<ConfirmacionPedido />} />
+                  <Route path="/estado-pedido/:id" element={<EstadoPedido />} />
                   <Route path="/admin/login" element={<AdminLogin />} />
                   <Route path="/admin/panel" element={
                     <AdminRoute>
