@@ -8,6 +8,7 @@ import Menu from "./pages/Menu/Menu";
 import ProductoDetalle from "./pages/ProductoDetalle/ProductoDetalle";
 import Carrito from "./pages/Carrito/Carrito";
 import EstadoPedido from "./pages/EstadoPedido/EstadoPedido";
+import Checkout from "./pages/Checkout/Checkout";
 import Header from "./components/Header/Header";
 import Footer from "./components/Footer/Footer";
 import CartIcon from "./components/CartIcon/CartIcon";
@@ -28,6 +29,8 @@ function App() {
                 <Route path="/producto/:id" element={<ProductoDetalle />} />
                 <Route path="/carrito" element={<Carrito />} />
                 <Route path="/estado-pedido/:id" element={<EstadoPedido />} />
+                <Route path="/checkout" element={<Checkout />} />
+                <Route path="*" element={<h2>404 - Página no encontrada</h2>} />
               </Routes>
             </main>
             <Footer />

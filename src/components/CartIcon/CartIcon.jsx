@@ -6,13 +6,14 @@ import styles from "./CartIcon.module.css";
 
 const CartIcon = () => {
   // Usamos useCarrito en lugar de useCart
-  const { totalItems, carrito, notification } = useCarrito();
+  const { totalItems, notification } = useCarrito();
 
   // Animación cuando se agrega un producto
   const [animate, setAnimate] = useState(false);
 
   useEffect(() => {
     if (notification?.show) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setAnimate(true);
       const timer = setTimeout(() => setAnimate(false), 300);
       return () => clearTimeout(timer);
