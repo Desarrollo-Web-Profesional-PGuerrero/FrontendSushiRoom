@@ -3,19 +3,27 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
-  background-color: #0a0a0a;
+  background-color: var(--wasabi-green);
   color: white;
   position: sticky;
   top: 0;
   z-index: 100;
+  width: 100%;
+  margin: 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 .logo a {
   font-size: 1.5rem;
   font-weight: bold;
-  color: white;
+  color: var(--cream-rice);
   text-decoration: none;
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Playfair Display', serif;
+  transition: color 0.3s ease;
+}
+
+.logo a:hover {
+  color: var(--salmon-coral);
 }
 
 .nav {
@@ -25,13 +33,32 @@
 }
 
 .nav a {
-  color: white;
+  color: var(--cream-rice);
   text-decoration: none;
-  transition: color 0.3s;
+  transition: all 0.3s;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  font-size: 0.95rem;
+  position: relative;
+}
+
+.nav a::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--salmon-coral);
+  transition: width 0.3s ease;
 }
 
 .nav a:hover {
-  color: #b22222;
+  color: var(--salmon-coral);
+}
+
+.nav a:hover::after {
+  width: 100%;
 }
 
 .carrito {
@@ -42,7 +69,7 @@
   position: absolute;
   top: -8px;
   right: -12px;
-  background-color: #b22222;
+  background-color: var(--salmon-coral);
   color: white;
   border-radius: 50%;
   width: 18px;
@@ -60,9 +87,27 @@
     padding: 1rem;
   }
   
+  .logo a {
+    font-size: 1.3rem;
+  }
+  
   .nav {
     flex-wrap: wrap;
     justify-content: center;
     gap: 1rem;
+    width: 100%;
+  }
+  
+  .nav a {
+    font-size: 0.85rem;
+    padding: 0.25rem 0.5rem;
+  }
+  
+  .badge {
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+    top: -6px;
+    right: -10px;
   }
 }

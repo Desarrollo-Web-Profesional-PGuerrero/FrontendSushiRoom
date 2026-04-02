@@ -1,7 +1,15 @@
 .footer {
-  background-color: #0a0a0a;
-  color: white;
-  text-align: center;
+  background-color: var(--wasabi-green);
+  color: var(--cream-rice);
   padding: 2rem;
+  text-align: center;
   margin-top: auto;
+}
+
+.footer a {
+  color: var(--salmon-coral);
+}
+
+.footer a:hover {
+  color: var(--olive-green);
 }
