@@ -21,11 +21,10 @@ const AdminPanel = () => {
   });
 
   const categorias = [
-  { value: 'clasicos', label: 'Clásicos' },
-  { value: 'especialidades', label: 'Especialidades' },
-  { value: 'vegetariano', label: 'Vegetariano' },
-  { value: 'bebidas', label: 'Bebidas' }
-];
+    { value: 'nigiri', label: 'Nigiri' },
+    { value: 'roll', label: 'Roll' },
+    { value: 'sashimi', label: 'Sashimi' }
+  ];
 
   const handleLogout = () => {
     logout();
@@ -40,35 +39,24 @@ const AdminPanel = () => {
     });
   };
 
-  const handleSubmit = async (e) => {
-  e.preventDefault();
-  
-  console.log('🚀 Formulario enviado');
-  console.log('📝 Datos del formulario:', formData);
-  
-  const productoData = {
-    ...formData,
-    precio: parseFloat(formData.precio),
-    ingredientes: formData.ingredientes.split(',').map(i => i.trim()),
-    imagen: formData.imagen || '/src/assets/images/default.jpg'
-  };
-  
-  console.log('📦 Producto a guardar:', productoData);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    const productoData = {
+      ...formData,
+      precio: parseFloat(formData.precio),
+      ingredientes: formData.ingredientes.split(',').map(i => i.trim()),
+      imagen: formData.imagen || '/src/assets/images/default.jpg'
+    };
 
-  try {
     if (editandoId) {
-      console.log('✏️ Editando producto:', editandoId);
-      await editarProducto(editandoId, productoData);
+      editarProducto(editandoId, productoData);
     } else {
-      console.log('➕ Agregando nuevo producto');
-      await agregarProducto(productoData);
+      agregarProducto(productoData);
     }
-    console.log('✅ Producto guardado exitosamente');
+
     resetForm();
-  } catch (error) {
-    console.error('❌ Error al guardar producto:', error);
-  }
-};
+  };
 
   const handleEdit = (producto) => {
     setEditandoId(producto.id);
