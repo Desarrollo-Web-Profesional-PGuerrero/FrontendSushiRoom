@@ -143,10 +143,16 @@ const Menu = () => {
         origen: producto.origen,
         notasCata: producto.notasCata,
         categoria: producto.categoria || null,
+        disponible: producto.activo, // Campo para saber si está disponible
       }));
 
-      setProductos(productosFormateados);
-      setProductosFiltrados(productosFormateados);
+      // 🔥 SOLO mostrar productos disponibles
+      const productosDisponibles = productosFormateados.filter(
+        (producto) => producto.disponible === true
+      );
+
+      setProductos(productosDisponibles);
+      setProductosFiltrados(productosDisponibles);
       setError(null);
     } catch (err) {
       console.error("Error al cargar productos:", err);
@@ -228,8 +234,8 @@ const Menu = () => {
           {activeFilter === "recomendados" ? "Recomendados para ti" : "Nuestro Menú"}
         </h1>
         <p className={styles.menuSubtitle}>
-          {activeFilter === "recomendados" 
-            ? "Selección especial basada en tus gustos" 
+          {activeFilter === "recomendados"
+            ? "Selección especial basada en tus gustos"
             : "Descubre nuestra selección de sushi artesanal"}
         </p>
       </div>
@@ -237,18 +243,16 @@ const Menu = () => {
       {/* Filtros */}
       <div className={styles.filtersContainer}>
         <button
-          className={`${styles.filterBtn} ${
-            activeFilter === "todos" ? styles.filterActive : ""
-          }`}
+          className={`${styles.filterBtn} ${activeFilter === "todos" ? styles.filterActive : ""
+            }`}
           onClick={mostrarTodosLosProductos}
         >
           <span className={styles.filterIcon}></span>
           <span>Todos los productos</span>
         </button>
         <button
-          className={`${styles.filterBtn} ${
-            activeFilter === "recomendados" ? styles.filterActive : ""
-          }`}
+          className={`${styles.filterBtn} ${activeFilter === "recomendados" ? styles.filterActive : ""
+            }`}
           onClick={mostrarRecomendados}
         >
           <span className={styles.filterIcon}></span>
@@ -298,9 +302,8 @@ const Menu = () => {
               </div>
             </Link>
             <button
-              className={`${styles.btnAgregar} ${
-                addingProduct === producto.id ? styles.btnAgregando : ""
-              }`}
+              className={`${styles.btnAgregar} ${addingProduct === producto.id ? styles.btnAgregando : ""
+                }`}
               onClick={() => handleAddToCart(producto)}
             >
               {addingProduct === producto.id ? (

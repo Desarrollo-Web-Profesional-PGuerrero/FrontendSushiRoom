@@ -4,9 +4,10 @@ import { useAdmin } from '../../hooks/useAdmin';
 import styles from './AdminPanel.module.css';
 
 const AdminPanel = () => {
-  const { logout, productos, agregarProducto, editarProducto, eliminarProducto, toggleDisponibilidad } = useAdmin();
+  const { logout, productos, agregarProducto, editarProducto, eliminarProducto } = useAdmin();
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [editandoId, setEditandoId] = useState(null);
   const [formData, setFormData] = useState({
     nombre: '',
@@ -90,24 +91,38 @@ const AdminPanel = () => {
     });
   };
 
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+
   return (
     <div className={styles.adminPanel}>
+      {/* Botón de menú hamburguesa para móvil */}
+      <button className={styles.menuHamburger} onClick={toggleMobileMenu}>
+        <span className={styles.hamburgerIcon}>☰</span>
+      </button>
+
+      {/* Overlay para móvil cuando el menú está abierto */}
+      {mobileMenuOpen && (
+        <div className={styles.overlay} onClick={toggleMobileMenu}></div>
+      )}
+
       {/* Sidebar */}
-      <aside className={styles.sidebar}>
+      <aside className={`${styles.sidebar} ${mobileMenuOpen ? styles.sidebarOpen : ''}`}>
         <div className={styles.logo}>
-          <div className={styles.logoIcon}>🍣</div>
           <h2>The Sushi Room</h2>
           <p>Administración</p>
         </div>
+        
         <nav className={styles.nav}>
           <button className={`${styles.navItem} ${styles.navItemActive}`}>
-            <span className={styles.navIcon}>📦</span>
-            Productos
+            <span>Productos</span>
           </button>
         </nav>
+        
         <button onClick={handleLogout} className={styles.logoutBtn}>
-          <span className={styles.logoutIcon}>🚪</span>
-          Cerrar Sesión
+          <span className={styles.logoutIcon}>➜</span>
+          <span>Cerrar Sesión</span>
         </button>
       </aside>
 
@@ -277,13 +292,12 @@ const AdminPanel = () => {
                     <th>Producto</th>
                     <th>Categoría</th>
                     <th>Precio</th>
-                    <th>Estado</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
                   {productos.map(producto => (
-                    <tr key={producto.id} className={!producto.disponible ? styles.inactivo : ''}>
+                    <tr key={producto.id}>
                       <td data-label="ID">#{producto.id}</td>
                       <td data-label="Producto">
                         <div className={styles.productoInfo}>
@@ -303,14 +317,6 @@ const AdminPanel = () => {
                       <td data-label="Precio" className={styles.precioCell}>
                         ${producto.precio}
                       </td>
-                      <td data-label="Estado">
-                        <button
-                          className={`${styles.estadoBtn} ${producto.disponible ? styles.disponible : styles.noDisponible}`}
-                          onClick={() => toggleDisponibilidad(producto.id)}
-                        >
-                          {producto.disponible ? 'Disponible' : 'No disponible'}
-                        </button>
-                      </td>
                       <td data-label="Acciones">
                         <div className={styles.acciones}>
                           <button
@@ -318,14 +324,14 @@ const AdminPanel = () => {
                             className={styles.editarBtn}
                             title="Editar"
                           >
-                            ✏️
+                            ✎
                           </button>
                           <button
                             onClick={() => eliminarProducto(producto.id)}
                             className={styles.eliminarBtn}
                             title="Eliminar"
                           >
-                            🗑️
+                            ✘
                           </button>
                         </div>
                       </td>

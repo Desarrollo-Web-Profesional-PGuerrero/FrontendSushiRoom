@@ -16,6 +16,40 @@
   display: flex;
   min-height: 100vh;
   background: linear-gradient(135deg, #fdf7ec 0%, #fff9f2 100%);
+  position: relative;
+}
+
+/* Botón de menú hamburguesa (solo visible en móvil) */
+.menuHamburger {
+  display: none;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  background: #1a1a1a;
+  border: none;
+  width: 45px;
+  height: 45px;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.hamburgerIcon {
+  font-size: 24px;
+  color: #ff8a5e;
+}
+
+/* Overlay para móvil */
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 800;
 }
 
 /* Sidebar */
@@ -28,6 +62,8 @@
   position: sticky;
   top: 0;
   height: 100vh;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
 }
 
 .logo {
@@ -47,6 +83,7 @@
   margin: 0;
   font-family: 'Playfair Display', serif;
   color: #ff8a5e;
+  white-space: nowrap;
 }
 
 .logo p {
@@ -55,6 +92,7 @@
   margin: 0.25rem 0 0;
   text-transform: uppercase;
   letter-spacing: 2px;
+  white-space: nowrap;
 }
 
 .nav {
@@ -75,10 +113,12 @@
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
 .navIcon {
   font-size: 1.2rem;
+  flex-shrink: 0;
 }
 
 .navItem:hover {
@@ -104,10 +144,12 @@
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
 .logoutIcon {
   font-size: 1.2rem;
+  flex-shrink: 0;
 }
 
 .logoutBtn:hover {
@@ -138,7 +180,7 @@
   font-weight: 700;
   color: #2f5d3a;
   margin: 0;
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Poppins', serif;
 }
 
 .contentHeader p {
@@ -403,10 +445,6 @@
   background: rgba(255, 138, 94, 0.03);
 }
 
-.table tbody tr.inactivo {
-  opacity: 0.6;
-}
-
 .productoInfo {
   display: flex;
   flex-direction: column;
@@ -435,36 +473,6 @@
 .precioCell {
   font-weight: 600;
   color: #ff8a5e;
-}
-
-.estadoBtn {
-  padding: 0.3rem 0.8rem;
-  border: none;
-  border-radius: 50px;
-  font-size: 0.7rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.disponible {
-  background: rgba(47, 93, 58, 0.15);
-  color: #2f5d3a;
-}
-
-.disponible:hover {
-  background: #2f5d3a;
-  color: white;
-}
-
-.noDisponible {
-  background: rgba(139, 115, 85, 0.15);
-  color: #8b7355;
-}
-
-.noDisponible:hover {
-  background: #8b7355;
-  color: white;
 }
 
 .acciones {
@@ -502,63 +510,51 @@
   transform: scale(1.1);
 }
 
-/* Responsive */
+/* ============================================ */
+/* RESPONSIVE - MÓVIL */
+/* ============================================ */
 @media (max-width: 768px) {
-  .adminPanel {
-    flex-direction: column;
-  }
-
-  .sidebar {
-    width: 100%;
-    height: auto;
-    position: relative;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 1rem;
-  }
-
-  .logo {
-    padding: 0.5rem 0;
-    border-bottom: none;
-    text-align: left;
-  }
-
-  .logo h2 {
-    font-size: 1rem;
-  }
-
-  .logo p {
-    font-size: 0.6rem;
-  }
-
-  .logoIcon {
-    font-size: 1.5rem;
-    margin-bottom: 0;
-  }
-
-  .nav {
+  /* Mostrar botón hamburguesa */
+  .menuHamburger {
     display: flex;
-    padding: 0;
+    align-items: center;
+    justify-content: center;
   }
 
-  .navItem {
-    width: auto;
-    padding: 0.5rem 1rem;
+  .overlay {
+    display: block;
   }
 
-  .logoutBtn {
-    margin: 0;
-    padding: 0.5rem 1rem;
+  /* Sidebar oculto por defecto en móvil */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    transform: translateX(-100%);
+    z-index: 900;
+    width: 280px;
+    height: 100vh;
+    transition: transform 0.3s ease;
   }
 
+  /* Sidebar visible cuando está abierto */
+  .sidebarOpen {
+    transform: translateX(0);
+  }
+
+  /* Contenido ocupa todo el ancho */
   .content {
     padding: 1rem;
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .contentHeader h1 {
+    font-size: 1.5rem;
   }
 
   .contentHeader {
-    flex-direction: column;
-    align-items: flex-start;
+    margin-top: 50px;
   }
 
   .formGrid {
@@ -573,6 +569,7 @@
     grid-column: span 1;
   }
 
+  /* Tabla responsive */
   .table thead {
     display: none;
   }
