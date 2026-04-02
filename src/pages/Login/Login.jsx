@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
+import { useAdmin } from '../../hooks/useAdmin';
 import styles from './Login.module.css';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login } = useAdmin();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -16,16 +16,26 @@ const Login = () => {
     setError('');
     setLoading(true);
 
-    // Simular delay
-    setTimeout(() => {
-      const success = login(email, password);
+    try {
+      const success = await login(email, password);
       if (success) {
-        navigate('/admin');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        if (user.rol === 'admin') {
+          navigate('/admin/panel');
+        } else if (user.rol === 'empleado') {
+          navigate('/empleado/panel');
+        } else {
+          navigate('/');
+        }
       } else {
-        setError('Credenciales incorrectas. Usa: admin@sushiroom.com / admin123');
+        setError('Credenciales incorrectas');
       }
+    // eslint-disable-next-line no-unused-vars
+    } catch (err) {
+      setError('Error al conectar con el servidor');
+    } finally {
       setLoading(false);
-    }, 500);
+    }
   };
 
   return (
@@ -33,7 +43,7 @@ const Login = () => {
       <div className={styles.loginCard}>
         <div className={styles.header}>
           <h1>The Sushi Room</h1>
-          <h2>Panel de Administración</h2>
+          <h2>Iniciar Sesión</h2>
         </div>
 
         <form onSubmit={handleSubmit} className={styles.form}>
@@ -58,7 +68,7 @@ const Login = () => {
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="admin123"
+              placeholder="••••••••"
               required
             />
           </div>
@@ -71,12 +81,6 @@ const Login = () => {
             ← Volver al sitio
           </Link>
         </form>
-
-        <div className={styles.demoInfo}>
-          <p>Credenciales de prueba:</p>
-          <p>Email: admin@sushiroom.com</p>
-          <p>Contraseña: admin123</p>
-        </div>
       </div>
     </div>
   );

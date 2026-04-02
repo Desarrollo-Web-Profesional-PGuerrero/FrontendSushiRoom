@@ -1,0 +1,267 @@
+.empleadoPanel {
+  display: flex;
+  min-height: 100vh;
+  background: #f5f5f5;
+}
+
+.menuHamburger {
+  display: none;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  background: #1a1a1a;
+  border: none;
+  width: 45px;
+  height: 45px;
+  border-radius: 12px;
+  cursor: pointer;
+  color: #ff8a5e;
+  font-size: 24px;
+}
+
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 800;
+}
+
+.sidebar {
+  width: 280px;
+  background: #1a1a1a;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  height: 100vh;
+  left: 0;
+  top: 0;
+}
+
+.logo {
+  padding: 2rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo h2 {
+  font-size: 1.3rem;
+  color: #ff8a5e;
+  margin: 0;
+}
+
+.logo p {
+  font-size: 0.7rem;
+  color: #8b7355;
+  margin: 0.25rem 0 0;
+}
+
+.userInfo {
+  padding: 1rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nav {
+  flex: 1;
+  padding: 1.5rem;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  width: 100%;
+  padding: 0.8rem 1rem;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  color: #e0e0e0;
+  cursor: pointer;
+}
+
+.navItemActive {
+  background: rgba(255, 138, 94, 0.15);
+  color: #ff8a5e;
+}
+
+.logoutBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin: 1.5rem;
+  padding: 0.8rem 1rem;
+  background: transparent;
+  border: 1px solid rgba(255, 138, 94, 0.3);
+  border-radius: 12px;
+  color: #ff8a5e;
+  cursor: pointer;
+}
+
+.content {
+  flex: 1;
+  margin-left: 280px;
+  padding: 2rem;
+}
+
+.contentHeader h1 {
+  font-size: 2rem;
+  color: #2f5d3a;
+  margin: 0;
+}
+
+.contentHeader p {
+  color: #8b7355;
+  margin: 0.25rem 0 0;
+}
+
+.estadosTabs {
+  display: flex;
+  gap: 1rem;
+  margin: 2rem 0 1rem;
+  flex-wrap: wrap;
+}
+
+.estadoTab {
+  padding: 0.5rem 1.5rem;
+  background: white;
+  border: 1px solid #e3dbce;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.pedidosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.pedidoCard {
+  background: white;
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.pedidoHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e3dbce;
+}
+
+.pedidoNumero {
+  font-weight: bold;
+  color: #2f5d3a;
+}
+
+.pedidoEstado {
+  padding: 0.2rem 0.8rem;
+  border-radius: 50px;
+  font-size: 0.7rem;
+  color: white;
+}
+
+.pedidoItems ul {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.pedidoTotal {
+  margin: 0.5rem 0;
+  padding-top: 0.5rem;
+  border-top: 1px solid #e3dbce;
+}
+
+.pedidoAcciones {
+  margin-top: 1rem;
+}
+
+.btnPreparar {
+  width: 100%;
+  padding: 0.5rem;
+  background: #ff8a5e;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 3rem;
+  color: #8b7355;
+}
+
+@media (max-width: 768px) {
+  .menuHamburger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .overlay {
+    display: block;
+  }
+
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 900;
+  }
+
+  .sidebarOpen {
+    transform: translateX(0);
+  }
+
+  .content {
+    margin-left: 0;
+    padding: 1rem;
+    margin-top: 60px;
+  }
+
+.btnPreparar, .btnListo, .btnEntregar {
+  width: 100%;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btnPreparar {
+  background: #ff8a5e;
+  color: white;
+}
+
+.btnPreparar:hover {
+  background: #e94560;
+}
+
+.btnListo {
+  background: #2196f3;
+  color: white;
+}
+
+.btnListo:hover {
+  background: #1976d2;
+}
+
+.btnEntregar {
+  background: #4caf50;
+  color: white;
+}
+
+.btnEntregar:hover {
+  background: #388e3c;
+}
+}

@@ -16,7 +16,10 @@ import AdminLogin from './pages/Admin/AdminLogin';
 import AdminPanel from './pages/Admin/AdminPanel';
 import Header from "./components/Header/Header";
 import Footer from "./components/Footer/Footer";
+import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
+import EmpleadoPanel from './pages/Admin/EmpleadoPanel';
 import ConfirmacionPedido from './pages/ConfirmacionPedido/ConfirmacionPedido';
+import Login from './pages/Login/Login';
 import "./App.css";
 
 function App() {
@@ -40,10 +43,16 @@ function App() {
                   <Route path="/checkout" element={<Checkout />} />
                   <Route path="/admin/login" element={<AdminLogin />} />
                   <Route path="/admin/panel" element={
-                    <AdminRoute>
+                    <PrivateRoute rolRequerido="admin">
                       <AdminPanel />
-                    </AdminRoute>
+                    </PrivateRoute>
                   } />
+                  <Route path="/empleado/panel" element={
+                    <PrivateRoute rolRequerido="empleado">
+                      <EmpleadoPanel />
+                    </PrivateRoute>
+                  } />
+                  <Route path="/login" element={<Login />} />
                   <Route path="*" element={<h2>404 - Página no encontrada</h2>} />
                 </Routes>
               </main>
@@ -56,4 +65,4 @@ function App() {
   );
 }
 
-export default App; 
+export default App;   

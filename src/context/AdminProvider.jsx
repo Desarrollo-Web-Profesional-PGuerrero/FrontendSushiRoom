@@ -7,10 +7,14 @@ export const AdminProvider = ({ children }) => {
   const [productos, setProductos] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem('adminAuth') === 'true';
+    const user = localStorage.getItem('user');
+    return user !== null;
+  });
+  const [user, setUser] = useState(() => {
+    const userData = localStorage.getItem('user');
+    return userData ? JSON.parse(userData) : null;
   });
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -23,26 +27,10 @@ export const AdminProvider = ({ children }) => {
     try {
       setLoading(true);
       const response = await fetch(`${API_URL}/productos`);
-      if (!response.ok) throw new Error('Error al cargar productos');
       const data = await response.json();
-
-      const productosFormateados = data.map(producto => ({
-        id: producto.id,
-        nombre: producto.nombre,
-        precio: producto.precio,
-        descripcion: producto.descripcion || '',
-        origen: producto.origen || '',
-        notasCata: producto.notasCata || '',
-        categoria: producto.categoriaNombre?.toLowerCase() || 'roll',
-        categoriaId: producto.categoriaId,
-        disponible: producto.activo,
-        imagen: producto.imagenUrl || '/src/assets/images/default.jpg',
-        ingredientes: []
-      }));
-
-      setProductos(productosFormateados);
+      setProductos(data);
     } catch (error) {
-      console.error('Error al cargar productos:', error);
+      console.error('Error:', error);
     } finally {
       setLoading(false);
     }
@@ -56,134 +44,81 @@ export const AdminProvider = ({ children }) => {
         setCategorias(data);
       }
     } catch (error) {
-      console.error('Error al cargar categorías:', error);
+      console.error('Error:', error);
     }
   };
 
-  // Login CONECTADO A BASE DE DATOS
   const login = async (email, password) => {
-    try {
-      const response = await fetch(`${API_URL}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email, password })
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        setIsAuthenticated(true);
-        localStorage.setItem('adminAuth', 'true');
-        localStorage.setItem('adminUser', JSON.stringify({
-          nombre: data.nombre,
-          email: data.email,
-          rol: data.rol
-        }));
-        setUser(data);
-        return true;
-      } else {
-        console.error('Error de login:', data.message);
-        return false;
-      }
-    } catch (error) {
-      console.error('Error al conectar con el servidor:', error);
-      return false;
+  try {
+    const response = await fetch(`${API_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      setIsAuthenticated(true);
+      localStorage.setItem('user', JSON.stringify({
+        nombre: data.nombre,
+        email: data.email,
+        rol: data.rol
+      }));
+      setUser({ nombre: data.nombre, email: data.email, rol: data.rol });
+      return true;
     }
-  };
+    return false;
+  } catch (error) {
+    console.error('Error:', error);
+    return false;
+  }
+};
 
   const logout = () => {
     setIsAuthenticated(false);
-    localStorage.removeItem('adminAuth');
-    localStorage.removeItem('adminUser');
+    localStorage.removeItem('user');
     setUser(null);
     setProductos([]);
   };
 
   const agregarProducto = async (producto) => {
     try {
-      const categoriaSeleccionada = categorias.find(
-        c => c.nombre.toLowerCase() === producto.categoria.toLowerCase()
-      );
-
-      const productoBackend = {
-        nombre: producto.nombre,
-        descripcion: producto.descripcion,
-        origen: producto.origen,
-        notasCata: producto.notasCata,
-        precio: parseFloat(producto.precio),
-        imagenUrl: producto.imagen,
-        activo: producto.disponible,
-        categoriaId: categoriaSeleccionada?.id || 2,
-        categoriaNombre: producto.categoria
-      };
-
       const response = await fetch(`${API_URL}/productos`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(productoBackend)
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(producto)
       });
-
-      if (!response.ok) throw new Error('Error al crear producto');
-
-      await cargarProductos();
-      return true;
+      if (response.ok) {
+        await cargarProductos();
+      }
     } catch (error) {
-      console.error('Error al agregar producto:', error);
-      throw error;
+      console.error('Error:', error);
     }
   };
 
-  const editarProducto = async (id, productoActualizado) => {
+  const editarProducto = async (id, producto) => {
     try {
-      const categoriaSeleccionada = categorias.find(
-        c => c.nombre.toLowerCase() === productoActualizado.categoria.toLowerCase()
-      );
-
-      const productoBackend = {
-        nombre: productoActualizado.nombre,
-        descripcion: productoActualizado.descripcion,
-        origen: productoActualizado.origen,
-        notasCata: productoActualizado.notasCata,
-        precio: parseFloat(productoActualizado.precio),
-        imagenUrl: productoActualizado.imagen,
-        activo: productoActualizado.disponible,
-        categoriaId: categoriaSeleccionada?.id || 2,
-        categoriaNombre: productoActualizado.categoria
-      };
-
       const response = await fetch(`${API_URL}/productos/${id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(productoBackend)
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(producto)
       });
-
-      if (!response.ok) throw new Error('Error al editar producto');
-
-      await cargarProductos();
+      if (response.ok) {
+        await cargarProductos();
+      }
     } catch (error) {
-      console.error('Error al editar producto:', error);
-      throw error;
+      console.error('Error:', error);
     }
   };
 
   const eliminarProducto = async (id) => {
     if (window.confirm('¿Eliminar este producto?')) {
       try {
-        const response = await fetch(`${API_URL}/productos/${id}`, {
-          method: 'DELETE'
-        });
-
-        if (!response.ok) throw new Error('Error al eliminar producto');
-
+        await fetch(`${API_URL}/productos/${id}`, { method: 'DELETE' });
         await cargarProductos();
       } catch (error) {
-        console.error('Error al eliminar producto:', error);
+        console.error('Error:', error);
       }
     }
   };
@@ -192,8 +127,8 @@ export const AdminProvider = ({ children }) => {
     productos,
     categorias,
     isAuthenticated,
-    loading,
     user,
+    loading,
     login,
     logout,
     agregarProducto,
