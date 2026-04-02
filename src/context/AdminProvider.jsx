@@ -1,82 +1,139 @@
 import React, { useState, useEffect } from 'react';
 import { AdminContext } from './AdminContext';
 
-// Datos iniciales de productos
-const productosIniciales = [
-  { id: 1, nombre: 'Salmón Nigiri', precio: 105, imagen: '/src/assets/images/salmon.jpg', disponible: true },
-  { id: 2, nombre: 'Atún Nigiri', precio: 115, imagen: '/src/assets/images/tuna.jpg', disponible: true },
-  { id: 3, nombre: 'Roll California', precio: 125, imagen: '/src/assets/images/california.png', disponible: true },
-  { id: 4, nombre: 'Roll Spicy Tuna', precio: 130, imagen: '/src/assets/images/spicy.jpg', disponible: true },
-  { id: 5, nombre: 'Sashimi Salmón', precio: 120, imagen: '/src/assets/images/sashimi.png', disponible: true },
-  { id: 6, nombre: 'Ebi Roll', precio: 110, imagen: '/src/assets/images/ebi.jpg', disponible: true },
-];
+const API_URL = 'http://localhost:8080/api';
 
 export const AdminProvider = ({ children }) => {
-  const [productos, setProductos] = useState(() => {
-    const guardados = localStorage.getItem('productos');
-    return guardados ? JSON.parse(guardados) : productosIniciales;
-  });
-  
+  const [productos, setProductos] = useState([]);
+  const [categorias, setCategorias] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem('adminAuth') === 'true';
+    const user = localStorage.getItem('user');
+    return user !== null;
   });
+  const [user, setUser] = useState(() => {
+    const userData = localStorage.getItem('user');
+    return userData ? JSON.parse(userData) : null;
+  });
+  const [loading, setLoading] = useState(true);
 
-  // Guardar productos en localStorage
   useEffect(() => {
-    localStorage.setItem('productos', JSON.stringify(productos));
-  }, [productos]);
-
-  // Guardar estado de autenticación
-  useEffect(() => {
-    localStorage.setItem('adminAuth', isAuthenticated);
+    if (isAuthenticated) {
+      cargarProductos();
+      cargarCategorias();
+    }
   }, [isAuthenticated]);
 
-  // Login
-  const login = (email, password) => {
-    if (email === 'admin@sushiroom.com' && password === 'admin123') {
+  const cargarProductos = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_URL}/productos`);
+      const data = await response.json();
+      setProductos(data);
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const cargarCategorias = async () => {
+    try {
+      const response = await fetch(`${API_URL}/productos/categorias`);
+      if (response.ok) {
+        const data = await response.json();
+        setCategorias(data);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const login = async (email, password) => {
+  try {
+    const response = await fetch(`${API_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
       setIsAuthenticated(true);
+      localStorage.setItem('user', JSON.stringify({
+        nombre: data.nombre,
+        email: data.email,
+        rol: data.rol
+      }));
+      setUser({ nombre: data.nombre, email: data.email, rol: data.rol });
       return true;
     }
     return false;
-  };
+  } catch (error) {
+    console.error('Error:', error);
+    return false;
+  }
+};
 
-  // Logout
   const logout = () => {
     setIsAuthenticated(false);
+    localStorage.removeItem('user');
+    setUser(null);
+    setProductos([]);
   };
 
-  // Agregar producto
-  const agregarProducto = (producto) => {
-    const nuevoId = Math.max(...productos.map(p => p.id), 0) + 1;
-    setProductos([...productos, { ...producto, id: nuevoId }]);
-  };
-
-  // Editar producto
-  const editarProducto = (id, productoActualizado) => {
-    setProductos(productos.map(p => p.id === id ? { ...productoActualizado, id } : p));
-  };
-
-  // Eliminar producto
-  const eliminarProducto = (id) => {
-    if (window.confirm('¿Eliminar este producto?')) {
-      setProductos(productos.filter(p => p.id !== id));
+  const agregarProducto = async (producto) => {
+    try {
+      const response = await fetch(`${API_URL}/productos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(producto)
+      });
+      if (response.ok) {
+        await cargarProductos();
+      }
+    } catch (error) {
+      console.error('Error:', error);
     }
   };
 
-  // Cambiar disponibilidad
-  const toggleDisponibilidad = (id) => {
-    setProductos(productos.map(p => p.id === id ? { ...p, disponible: !p.disponible } : p));
+  const editarProducto = async (id, producto) => {
+    try {
+      const response = await fetch(`${API_URL}/productos/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(producto)
+      });
+      if (response.ok) {
+        await cargarProductos();
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const eliminarProducto = async (id) => {
+    if (window.confirm('¿Eliminar este producto?')) {
+      try {
+        await fetch(`${API_URL}/productos/${id}`, { method: 'DELETE' });
+        await cargarProductos();
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
   };
 
   const value = {
     productos,
+    categorias,
     isAuthenticated,
+    user,
+    loading,
     login,
     logout,
     agregarProducto,
     editarProducto,
     eliminarProducto,
-    toggleDisponibilidad
   };
 
   return (

@@ -10,13 +10,11 @@ const EstadoPedido = () => {
   const navigate = useNavigate();
   const { pedidoActivo, loading, obtenerPedido, pasos } = usePedido();
   
-  // Estado para los datos curiosos
   const [datoCurioso, setDatoCurioso] = useState(null);
   const [animating, setAnimating] = useState(false);
   const [imagenChef, setImagenChef] = useState('');
   const intervalRef = useRef(null);
 
-  // Lista de imágenes del chef preparando sushi
   const imagenesChef = [
     "https://tse4.mm.bing.net/th/id/OIP.ZROPqiLCuL-KQc6-warR9AHaE7?rs=1&pid=ImgDetMain&o=7&rm=3",
     "https://thumbs.dreamstime.com/b/chef-preparing-sushi-closeup-hands-japanese-food-japanese-making-restaurant-young-serving-traditional-japanese-76596912.jpg",
@@ -25,7 +23,6 @@ const EstadoPedido = () => {
     "https://img.freepik.com/fotos-premium/primer-plano-chef-japones-preparandose-cocinar-comida-japonesa-hacer-sushi-restaurante-japones-tradicional-tabla-cortar_369024-1440.jpg"
   ];
 
-  // Lista de datos curiosos sobre sushi
   const datosCuriosos = [
     {
       id: 1,
@@ -92,7 +89,7 @@ const EstadoPedido = () => {
     },
     {
       id: 10,
-      titulo: "Soy sauce",
+      titulo: "Salsa de soya",
       texto: "Al mojar el sushi en salsa de soya, se debe mojar el pescado, no el arroz, para que no se deshaga.",
       emoji: "🥢",
       color: "#795548"
@@ -113,11 +110,9 @@ const EstadoPedido = () => {
     }
   ];
 
-  // Función para cambiar a un dato curioso aleatorio y también la imagen
   const cambiarDatoCurioso = useCallback(() => {
     setAnimating(true);
     
-    // Seleccionar un dato aleatorio diferente al actual
     let nuevoDato;
     do {
       const randomIndex = Math.floor(Math.random() * datosCuriosos.length);
@@ -126,7 +121,6 @@ const EstadoPedido = () => {
     
     setDatoCurioso(nuevoDato);
     
-    // Cambiar también la imagen del chef por una diferente
     let nuevaImagen;
     do {
       const randomIndex = Math.floor(Math.random() * imagenesChef.length);
@@ -135,13 +129,11 @@ const EstadoPedido = () => {
     
     setImagenChef(nuevaImagen);
     
-    // Quitar animación después de 0.5 segundos
     setTimeout(() => {
       setAnimating(false);
     }, 500);
   }, [datoCurioso, imagenChef]);
 
-  // Cargar pedido SOLO UNA VEZ al montar el componente
   useEffect(() => {
     const cargarPedido = async () => {
       if (id) {
@@ -157,29 +149,24 @@ const EstadoPedido = () => {
     cargarPedido();
   }, [id, obtenerPedido, navigate]);
 
-  // Inicializar datos curiosos y imagen SOLO UNA VEZ
   useEffect(() => {
-    // Seleccionar un dato aleatorio inicial
     const randomDatoIndex = Math.floor(Math.random() * datosCuriosos.length);
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setDatoCurioso(datosCuriosos[randomDatoIndex]);
     
-    // Seleccionar una imagen aleatoria inicial
     const randomImagenIndex = Math.floor(Math.random() * imagenesChef.length);
     setImagenChef(imagenesChef[randomImagenIndex]);
     
-    // Configurar intervalo para cambiar dato e imagen cada 15 segundos
     intervalRef.current = setInterval(() => {
       cambiarDatoCurioso();
     }, 15000);
     
-    // Limpiar intervalo al desmontar
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
     };
-  }, []); // Array vacío para que se ejecute solo una vez
+  }, []);
 
   if (loading) {
     return (
@@ -205,21 +192,33 @@ const EstadoPedido = () => {
     timeStyle: 'short'
   });
 
-  // Calcular tiempo estimado basado en el estado
   const getTiempoEstimado = () => {
     switch(pedidoActivo.estado) {
       case 'confirmado':
-        return '⏳ Tiempo estimado: 5-10 minutos';
+        return 'Tiempo estimado: 5-10 minutos';
       case 'preparacion':
-        return '🍣 Tiempo estimado: 15-20 minutos';
+        return 'Tiempo estimado: 15-20 minutos';
       case 'listo':
-        return '✅ Tu pedido está listo para entregar';
+        return 'Tu pedido está listo para entregar';
       case 'en_camino':
-        return '🚚 Tu pedido está en camino';
+        return 'Tu pedido está en camino';
       case 'entregado':
-        return '🎉 ¡Disfruta tu sushi!';
+        return '¡Disfruta tu sushi!';
       default:
-        return '⏳ Procesando tu pedido...';
+        return 'Procesando tu pedido...';
+    }
+  };
+
+  const getMetodoPagoTexto = () => {
+    switch(pedidoActivo.metodoPago) {
+      case 'efectivo':
+        return 'Efectivo';
+      case 'tarjeta':
+        return 'Tarjeta';
+      case 'transferencia':
+        return 'Transferencia';
+      default:
+        return pedidoActivo.metodoPago;
     }
   };
 
@@ -250,10 +249,7 @@ const EstadoPedido = () => {
             </div>
             <div className={styles.infoRow}>
               <span className={styles.label}>Método de pago:</span>
-              <span className={styles.value}>
-                {pedidoActivo.metodoPago === 'efectivo' ? '💵 Efectivo' : 
-                 pedidoActivo.metodoPago === 'tarjeta' ? '💳 Tarjeta' : '🏦 Transferencia'}
-              </span>
+              <span className={styles.value}>{getMetodoPagoTexto()}</span>
             </div>
             <div className={styles.infoRow}>
               <span className={styles.label}>Tiempo estimado:</span>
@@ -271,7 +267,7 @@ const EstadoPedido = () => {
           />
         </div>
 
-        {/* SECCIÓN DE DATOS CURIOSOS CON IMAGEN DEL CHEF - DATO ENCIMA DE LA IMAGEN */}
+        {/* SECCIÓN DE DATOS CURIOSOS */}
         <div className={styles.curiousSection}>
           <div className={styles.curiousContainer}>
             <div className={styles.curiousHeader}>
@@ -286,9 +282,7 @@ const EstadoPedido = () => {
               </button>
             </div>
             
-            {/* Contenedor con imagen y dato curioso superpuesto */}
             <div className={`${styles.curiosoContainer} ${animating ? styles.curiosoContainerAnimating : ''}`}>
-              {/* Imagen de fondo del chef */}
               {imagenChef && (
                 <div className={styles.chefImageWrapper}>
                   <img 
@@ -300,7 +294,6 @@ const EstadoPedido = () => {
                 </div>
               )}
               
-              {/* Dato curioso encima de la imagen */}
               {datoCurioso && (
                 <div className={styles.datoSuperpuesto}>
                   <div className={styles.datoCard}>
@@ -322,7 +315,7 @@ const EstadoPedido = () => {
             
             <div className={styles.curiousFooter}>
               <div className={styles.curiousMessage}>
-                <span>📖 Mientras esperas, aprende más sobre sushi</span>
+                <span>Mientras esperas, aprende más sobre sushi</span>
               </div>
               <button 
                 className={styles.curiousNextBtn}

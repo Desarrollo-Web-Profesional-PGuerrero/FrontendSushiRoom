@@ -1,6 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
 :root {
-  font-family: 'Montserrat', sans-serif;
+  --olive-green: #6f7419;
+  --wasabi-green: #182e1d;
+  --cream-rice: #fdf7ec;
+  --bamboo-brown: #8b7355;
+  --salmon-coral: #ff8a5e;
+  --natural-beige: #e3dbce;
+  
+  font-family: 'Poppins', sans-serif;
   line-height: 1.5;
   font-weight: 400;
 }
@@ -12,7 +20,14 @@
 }
 
 body {
-  background-color: #f5f5f5;
-  color: #333;
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: var(--cream-rice);
+  color: var(--bamboo-brown);
 }
 
+#root {
+  width: 100%;
+  min-height: 100vh;
+}

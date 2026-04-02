@@ -3,21 +3,23 @@ import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CarritoProvider } from "./context/CarritoProvider";
 import { PedidoProvider } from "./context/PedidoProvider";
-import { AdminProvider } from "./context/AdminProvider";
-import AdminRoute from "./components/AdminRoute/AdminRoute";
 import Home from "./pages/Home/Home";
 import Menu from "./pages/Menu/Menu";
-import Experiencia from "./pages/Experiencia/Experiencia";
+import Experiencia from './pages/Experiencia/Experiencia';
+import { AdminProvider } from "./context/AdminProvider";
+import AdminRoute from "./components/AdminRoute/AdminRoute";
 import ProductoDetalle from "./pages/ProductoDetalle/ProductoDetalle";
 import Carrito from "./pages/Carrito/Carrito";
 import EstadoPedido from "./pages/EstadoPedido/EstadoPedido";
 import Checkout from "./pages/Checkout/Checkout";
-import AdminLogin from "./pages/Admin/AdminLogin";
-import AdminPanel from "./pages/Admin/AdminPanel";
+import AdminLogin from './pages/Admin/AdminLogin';
+import AdminPanel from './pages/Admin/AdminPanel';
 import Header from "./components/Header/Header";
 import Footer from "./components/Footer/Footer";
-import CartIcon from "./components/CartIcon/CartIcon";
+import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
+import EmpleadoPanel from './pages/Admin/EmpleadoPanel';
 import ConfirmacionPedido from './pages/ConfirmacionPedido/ConfirmacionPedido';
+import Login from './pages/Login/Login';
 import "./App.css";
 
 function App() {
@@ -28,7 +30,6 @@ function App() {
           <PedidoProvider>
             <div className="app">
               <Header />
-              <CartIcon />
               <main className="main-content">
                 <Routes>
                   <Route path="/" element={<Home />} />
@@ -39,12 +40,19 @@ function App() {
                   <Route path="/checkout" element={<Checkout />} />
                   <Route path="/confirmacion" element={<ConfirmacionPedido />} />
                   <Route path="/estado-pedido/:id" element={<EstadoPedido />} />
+                  <Route path="/checkout" element={<Checkout />} />
                   <Route path="/admin/login" element={<AdminLogin />} />
                   <Route path="/admin/panel" element={
-                    <AdminRoute>
+                    <PrivateRoute rolRequerido="admin">
                       <AdminPanel />
-                    </AdminRoute>
+                    </PrivateRoute>
                   } />
+                  <Route path="/empleado/panel" element={
+                    <PrivateRoute rolRequerido="empleado">
+                      <EmpleadoPanel />
+                    </PrivateRoute>
+                  } />
+                  <Route path="/login" element={<Login />} />
                   <Route path="*" element={<h2>404 - Página no encontrada</h2>} />
                 </Routes>
               </main>
@@ -57,4 +65,4 @@ function App() {
   );
 }
 
-export default App;
+export default App;   
