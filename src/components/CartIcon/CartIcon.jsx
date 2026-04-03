@@ -5,15 +5,11 @@ import { useCarrito } from "../../hooks/useCarrito";
 import styles from "./CartIcon.module.css";
 
 const CartIcon = () => {
-  // Usamos useCarrito en lugar de useCart
   const { totalItems, notification } = useCarrito();
-
-  // Animación cuando se agrega un producto
   const [animate, setAnimate] = useState(false);
 
   useEffect(() => {
     if (notification?.show) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setAnimate(true);
       const timer = setTimeout(() => setAnimate(false), 300);
       return () => clearTimeout(timer);
@@ -30,7 +26,7 @@ const CartIcon = () => {
         </div>
       )}
 
-      <Link to="/carrito" className={styles.cartIcon}>
+      <Link to="/carrito" className={styles.cartIcon} aria-label="Carrito de compras">
         <div
           className={`${styles.iconContainer} ${animate ? styles.bump : ""}`}
         >
@@ -43,6 +39,7 @@ const CartIcon = () => {
             strokeLinecap="round"
             strokeLinejoin="round"
             className={styles.icon}
+            aria-hidden="true"
           >
             <circle cx="9" cy="21" r="1"></circle>
             <circle cx="20" cy="21" r="1"></circle>

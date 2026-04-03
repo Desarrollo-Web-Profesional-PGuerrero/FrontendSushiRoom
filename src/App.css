@@ -1,14 +1,70 @@
+/* src/App.css */
+
+/* Variables globales - colores y breakpoints */
+:root {
+  /* Colores principales */
+  --salmon-coral: #EE3F24;
+  --wasabi-green: #023820;
+  --olive-green: #235347;
+  --cream-rice: #FFF4E6;
+  --natural-beige: #FFEFCB;
+  --golden: #F9A11B;
+  
+  /* Breakpoints responsive */
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1200px;
+  
+  /* Espaciado responsive */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 3rem;
+  
+  /* Sombras */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Reset y estilos base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Inter', 'Poppins', sans-serif;
+  line-height: 1.5;
+  background-color: var(--cream-rice);
+  overflow-x: hidden;
+}
+
+/* Layout principal */
 .app {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   width: 100%;
   background-color: var(--cream-rice);
+  position: relative;
+  overflow-x: hidden;
 }
 
 .main-content {
   flex: 1;
   width: 100%;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 0;
   background-color: var(--cream-rice);
@@ -25,12 +81,27 @@ button {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
+  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 button:hover {
   background-color: var(--wasabi-green);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(47, 93, 58, 0.3);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 /* Enlaces */
@@ -49,16 +120,192 @@ a:hover {
   background-color: var(--natural-beige);
   border-radius: 12px;
   padding: 1.5rem;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: var(--shadow-sm);
 }
 
-.card:hover {
+.card:hover, .section:hover {
   transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(111, 116, 25, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
+/* Utilidades responsivas */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+}
+
+/* Animaciones suaves */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--natural-beige);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--salmon-coral);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--wasabi-green);
+}
+
+/* ============================================ */
+/* RESPONSIVE DESIGN - HU14 */
+/* ============================================ */
+
+/* Tablet (768px - 992px) */
+@media (max-width: 992px) {
+  :root {
+    --spacing-md: 1.2rem;
+    --spacing-lg: 1.5rem;
+  }
+  
+  html {
+    font-size: 15px;
+  }
+  
+  .container {
+    padding: 0 var(--spacing-sm);
+  }
+  
+  .card, .section {
+    padding: 1.2rem;
+  }
+  
+  button {
+    padding: 10px 20px;
+    font-size: 0.95rem;
+  }
+}
+
+/* Móvil grande (576px - 768px) */
 @media (max-width: 768px) {
+  :root {
+    --spacing-sm: 0.8rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.2rem;
+  }
+  
+  html {
+    font-size: 14px;
+  }
+  
   .main-content {
+    padding: 0;
+  }
+  
+  button {
+    padding: 10px 18px;
+    font-size: 0.9rem;
+    width: 100%;
+  }
+  
+  .card, .section {
     padding: 1rem;
+    border-radius: 10px;
+  }
+}
+
+/* Móvil pequeño (hasta 576px) */
+@media (max-width: 576px) {
+  :root {
+    --spacing-xs: 0.3rem;
+    --spacing-sm: 0.6rem;
+    --spacing-md: 0.8rem;
+  }
+  
+  html {
+    font-size: 13px;
+  }
+  
+  button {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+  }
+  
+  .card, .section {
+    padding: 0.8rem;
+    border-radius: 8px;
+  }
+}
+
+/* Móvil muy pequeño (hasta 380px) */
+@media (max-width: 380px) {
+  html {
+    font-size: 12px;
+  }
+  
+  button {
+    padding: 8px 14px;
+  }
+}
+
+/* Orientación landscape en móvil */
+@media (max-width: 768px) and (orientation: landscape) {
+  .main-content {
+    min-height: auto;
+  }
+  
+  button {
+    padding: 6px 14px;
+  }
+}
+
+/* Pantallas grandes (1200px+) */
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1400px;
+  }
+  
+  .main-content {
+    padding: 0 var(--spacing-lg);
+  }
+}
+
+/* Optimización para impresión */
+@media print {
+  .app {
+    background: white;
+  }
+  
+  button, 
+  .no-print {
+    display: none;
+  }
+}
+
+/* Reducción de movimiento para accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

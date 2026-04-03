@@ -104,7 +104,7 @@
   align-items: center;
   gap: 0.8rem;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
+  z-index: 1001;
   animation: slideInRight 0.3s ease-out;
   font-weight: 500;
 }

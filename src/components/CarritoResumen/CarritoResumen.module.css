@@ -1,4 +1,5 @@
 /* src/pages/CarritoResumen/CarritoResumen.module.css */
+
 .container {
   min-height: 100vh;
   background: linear-gradient(135deg, #023820 0%, #035a2e 100%);
@@ -270,7 +271,11 @@
   to { transform: rotate(360deg); }
 }
 
-/* Responsive */
+/* ============================================ */
+/* RESPONSIVE - HU14 */
+/* ============================================ */
+
+/* Móvil (hasta 600px) */
 @media (max-width: 600px) {
   .container {
     padding: 1rem;
@@ -281,7 +286,7 @@
   }
   
   .resumen h1 {
-    font-size: 2rem;
+    font-size: 1.8rem;
   }
   
   .item {
@@ -309,6 +314,8 @@
     position: absolute;
     top: 0.5rem;
     right: 0.5rem;
+    width: 40px;
+    height: 40px;
   }
   
   .total {
@@ -320,10 +327,126 @@
   }
   
   .notification {
-    top: 10px;
-    right: 10px;
-    padding: 0.75rem 1rem;
+    top: auto;
+    bottom: 20px;
+    right: 20px;
+    left: 20px;
+    text-align: center;
+    justify-content: center;
+    border-radius: 50px;
+  }
+  
+  /* Botones táctiles (mínimo 44x44px) */
+  .btnCantidad {
+    width: 44px;
+    height: 44px;
+    font-size: 1.5rem;
+  }
+  
+  .cantidad {
+    gap: 0.8rem;
+    padding: 0.5rem;
+  }
+  
+  .cantidad span {
+    min-width: 40px;
+    font-size: 1.2rem;
+  }
+  
+  .btnPago {
+    padding: 1rem;
+    font-size: 1.1rem;
+    min-height: 56px;
+  }
+  
+  .btnMenu {
+    min-height: 56px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Modal mejorado */
+  .modal {
+    width: 90%;
+    max-width: 320px;
+    padding: 1.5rem;
+    border-radius: 20px;
+  }
+  
+  .modal h3 {
+    font-size: 1.3rem;
+  }
+  
+  .modal p {
     font-size: 0.9rem;
+  }
+  
+  .modalButtons {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  
+  .modalBtnCancelar,
+  .modalBtnConfirmar {
+    width: 100%;
+    padding: 0.9rem;
+    font-size: 1rem;
+  }
+}
+
+/* Tablet (601px - 1024px) */
+@media (min-width: 601px) and (max-width: 1024px) {
+  .container {
+    padding: 1.5rem;
+  }
+  
+  .resumen {
+    max-width: 90%;
+  }
+  
+  .btnCantidad {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+/* Móvil muy pequeño (hasta 380px) */
+@media (max-width: 380px) {
+  .resumen h1 {
+    font-size: 1.5rem;
+  }
+  
+  .info h3 {
+    font-size: 0.95rem;
+  }
+  
+  .precio {
+    font-size: 0.8rem;
+  }
+  
+  .badgeNota {
+    max-width: 160px;
+  }
+}
+
+/* Orientación landscape en móvil */
+@media (max-width: 768px) and (orientation: landscape) {
+  .container {
+    padding: 0.5rem;
+  }
+  
+  .resumen {
+    padding: 0.8rem;
+  }
+  
+  .item {
+    padding: 0.8rem;
+  }
+  
+  .notification {
+    top: 10px;
+    bottom: auto;
   }
 }
 
@@ -490,5 +613,21 @@
   .personalizacionInfo {
     flex-direction: column;
     gap: 0.3rem;
+  }
+}
+
+/* Reducción de movimiento para accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  .modal,
+  .notification,
+  .btnPago,
+  .btnCantidad,
+  .btnEliminar {
+    transition: none;
+    animation: none;
+  }
+  
+  .item:hover {
+    transform: none;
   }
 }

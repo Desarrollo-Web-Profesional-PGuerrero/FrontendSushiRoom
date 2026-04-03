@@ -86,7 +86,7 @@ const CarritoResumen = () => {
         <div className={styles.lista}>
           {cart.map(item => (
             <div key={item.id} className={styles.item}>
-              <img src={item.imagen} alt={item.nombre} className={styles.imagen} />
+              <img src={item.imagen} alt={item.nombre} className={styles.imagen} loading="lazy" />
               
               <div className={styles.info}>
                 <h3>{item.nombre}</h3>
