@@ -1,4 +1,6 @@
 /* src/components/CartIcon/CartIcon.module.css */
+
+/* Desktop */
 .cartIcon {
   position: fixed;
   top: 20px;
@@ -14,6 +16,7 @@
   text-decoration: none;
   transition: all 0.3s ease;
   z-index: 100;
+  cursor: pointer;
 }
 
 .cartIcon:hover {
@@ -21,8 +24,28 @@
   background: #F9A11B;
 }
 
+.cartIcon:active {
+  transform: scale(0.95);
+}
+
+.iconContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
 .icon {
-  font-size: 1.5rem;
+  width: 24px;
+  height: 24px;
+  color: #EE3F24;
+  transition: color 0.3s ease;
+}
+
+.cartIcon:hover .icon {
+  color: white;
 }
 
 .badge {
@@ -40,33 +63,170 @@
   align-items: center;
   justify-content: center;
   padding: 0 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.badgePulse {
-  animation: pulse 0.5s ease;
+/* Animación de bump */
+.bump {
+  animation: bump 0.3s ease-out;
 }
 
-@keyframes pulse {
+@keyframes bump {
   0% {
     transform: scale(1);
   }
   50% {
-    transform: scale(1.3);
+    transform: scale(1.2);
   }
   100% {
     transform: scale(1);
   }
 }
 
+/* Notificación flotante - mejorada */
+.notification {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  background: #28a745;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  z-index: 101;
+  transform: translateX(400px);
+  transition: transform 0.3s ease;
+  max-width: 90vw;
+}
+
+.notificationShow {
+  transform: translateX(0);
+}
+
+.notificationIcon {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+/* ============================================ */
+/* RESPONSIVE - Tablet y Móvil */
+/* ============================================ */
+
+/* Tablet */
 @media (max-width: 768px) {
+  .cartIcon {
+    top: 15px;
+    right: 15px;
+    width: 44px;
+    height: 44px;
+  }
+  
+  .icon {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .badge {
+    min-width: 18px;
+    height: 18px;
+    font-size: 0.65rem;
+    top: -4px;
+    right: -4px;
+  }
+  
+  .notification {
+    top: 70px;
+    right: 15px;
+    padding: 10px 16px;
+    font-size: 0.85rem;
+  }
+}
+
+/* Móvil grande */
+@media (max-width: 576px) {
   .cartIcon {
     top: 10px;
     right: 10px;
     width: 40px;
     height: 40px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   }
   
   .icon {
-    font-size: 1.2rem;
+    width: 18px;
+    height: 18px;
+  }
+  
+  .badge {
+    min-width: 16px;
+    height: 16px;
+    font-size: 0.6rem;
+    top: -3px;
+    right: -3px;
+  }
+  
+  .notification {
+    top: 60px;
+    right: 10px;
+    left: 10px;
+    max-width: calc(100vw - 20px);
+    padding: 8px 14px;
+    font-size: 0.8rem;
+    justify-content: center;
+  }
+}
+
+/* Móvil muy pequeño */
+@media (max-width: 380px) {
+  .cartIcon {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .icon {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .badge {
+    min-width: 14px;
+    height: 14px;
+    font-size: 0.55rem;
+    top: -2px;
+    right: -2px;
+  }
+}
+
+/* Orientación landscape en móvil */
+@media (max-width: 768px) and (orientation: landscape) {
+  .cartIcon {
+    top: 8px;
+    right: 8px;
+  }
+  
+  .notification {
+    top: 55px;
+  }
+}
+
+/* Reducción de movimiento para accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  .cartIcon,
+  .cartIcon:hover,
+  .bump,
+  .notification {
+    transition: none;
+    animation: none;
+  }
+  
+  @keyframes bump {
+    0%, 100% {
+      transform: scale(1);
+    }
   }
 }

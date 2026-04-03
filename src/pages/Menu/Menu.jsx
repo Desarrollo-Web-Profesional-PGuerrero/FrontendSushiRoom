@@ -288,6 +288,7 @@ const Menu = () => {
                 <img
                   src={producto.imagen}
                   alt={producto.nombre}
+                  loading="lazy"  // ← Agrega esta línea
                   onError={(e) => {
                     e.target.src = "/images/default.jpg";
                   }}
