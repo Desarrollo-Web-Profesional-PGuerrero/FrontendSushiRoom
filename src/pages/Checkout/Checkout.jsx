@@ -26,9 +26,8 @@ const Checkout = () => {
   useEffect(() => {
     const savedPropina = localStorage.getItem("propina");
     const savedPropinaPersonalizada = localStorage.getItem("propinaPersonalizada");
-    
+
     if (savedPropina) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPropina(JSON.parse(savedPropina));
     }
     if (savedPropinaPersonalizada) {
@@ -121,16 +120,50 @@ const Checkout = () => {
     setIsSubmitting(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      localStorage.setItem("userName", formData.nombre.split(" ")[0]);
-
-      const propinaMonto = propina > 0 
-        ? (totalPrecio * propina) / 100 
+      const propinaMonto = propina > 0
+        ? (totalPrecio * propina) / 100
         : (propinaPersonalizada && parseFloat(propinaPersonalizada) > 0 ? parseFloat(propinaPersonalizada) : 0);
 
+      // Preparar los items para el backend
+      const itemsParaBackend = carrito.map(item => ({
+        productoId: item.id,
+        nombreProducto: item.nombre,
+        cantidad: item.cantidad,
+        precio: item.precio
+      }));
+
+      // Datos del pedido para el backend
+      const datosPedido = {
+        metodoPago: formData.metodoPago === "efectivo" ? "Efectivo" :
+          formData.metodoPago === "tarjeta" ? "Tarjeta" : "Transferencia",
+        comentarios: `Cliente: ${formData.nombre} - Tel: ${formData.telefono} - Dirección: ${formData.direccion}`,
+        items: itemsParaBackend
+      };
+
+      console.log("Enviando pedido al backend:", datosPedido);
+
+      // Enviar al backend
+      // En Checkout.jsx, después de crear el pedido
+      const response = await fetch('http://localhost:8080/api/pedidos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(datosPedido)
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.pedido) {
+        // Redirigir con el ID del pedido
+        navigate(`/estado-pedido/${data.pedido.id}`);
+      }
+      if (!response.ok) {
+        throw new Error(data.message || "Error al crear el pedido");
+      }
+
+      // Guardar también en localStorage para compatibilidad
       const nuevoPedido = {
-        id: Date.now(),
+        id: data.pedido?.id || Date.now(),
+        numeroPedido: data.pedido?.numeroPedido || `PED-${Date.now()}`,
         fecha: new Date().toISOString(),
         items: carrito.map((item) => ({
           id: item.id,
@@ -147,7 +180,7 @@ const Checkout = () => {
         propina: propinaMonto,
         total: totalPrecio + propinaMonto,
         tiempoEstimado: getTiempoEstimado(),
-        estado: "confirmado",
+        estado: "pendiente",
         metodoPago: formData.metodoPago,
         datosCliente: {
           nombre: formData.nombre,
@@ -173,16 +206,28 @@ const Checkout = () => {
         state: {
           pedido: {
             id: nuevoPedido.id,
+            numeroPedido: nuevoPedido.numeroPedido,
             tiempoEstimado: nuevoPedido.tiempoEstimado,
             total: nuevoPedido.total,
             productos: nuevoPedido.productos,
           },
         },
       });
+      navigate(`/estado-pedido/${data.pedido.numeroPedido}`, {
+        state: {
+          pedido: {
+            id: data.pedido.id,
+            numeroPedido: data.pedido.numeroPedido,
+            tiempoEstimado: getTiempoEstimado(),
+            total: totalPrecio + propinaMonto,
+            productos: carrito.map(item => ({ nombre: item.nombre, cantidad: item.cantidad })),
+          },
+        },
+      });
     } catch (err) {
       console.error("Error al procesar el pedido:", err);
       setError(
-        "Ocurrió un error al procesar tu pedido. Por favor, intenta de nuevo."
+        err.message || "Ocurrió un error al procesar tu pedido. Por favor, intenta de nuevo."
       );
       setIsSubmitting(false);
     }
@@ -203,8 +248,8 @@ const Checkout = () => {
     );
   }
 
-  const propinaMonto = propina > 0 
-    ? (totalPrecio * propina) / 100 
+  const propinaMonto = propina > 0
+    ? (totalPrecio * propina) / 100
     : (propinaPersonalizada && parseFloat(propinaPersonalizada) > 0 ? parseFloat(propinaPersonalizada) : 0);
 
   return (
@@ -264,9 +309,8 @@ const Checkout = () => {
               <label>Método de pago</label>
               <div className={styles.paymentMethods}>
                 <label
-                  className={`${styles.paymentOption} ${
-                    formData.metodoPago === "efectivo" ? styles.paymentActive : ""
-                  }`}
+                  className={`${styles.paymentOption} ${formData.metodoPago === "efectivo" ? styles.paymentActive : ""
+                    }`}
                 >
                   <input
                     type="radio"
@@ -278,9 +322,8 @@ const Checkout = () => {
                   <span>Efectivo</span>
                 </label>
                 <label
-                  className={`${styles.paymentOption} ${
-                    formData.metodoPago === "tarjeta" ? styles.paymentActive : ""
-                  }`}
+                  className={`${styles.paymentOption} ${formData.metodoPago === "tarjeta" ? styles.paymentActive : ""
+                    }`}
                 >
                   <input
                     type="radio"
@@ -292,9 +335,8 @@ const Checkout = () => {
                   <span>Tarjeta de crédito/débito</span>
                 </label>
                 <label
-                  className={`${styles.paymentOption} ${
-                    formData.metodoPago === "transferencia" ? styles.paymentActive : ""
-                  }`}
+                  className={`${styles.paymentOption} ${formData.metodoPago === "transferencia" ? styles.paymentActive : ""
+                    }`}
                 >
                   <input
                     type="radio"
@@ -400,7 +442,7 @@ const Checkout = () => {
             <div className={styles.titleIcon}></div>
             <h2>Resumen del pedido</h2>
           </div>
-          
+
           <div className={styles.itemsList}>
             {carrito.map((item, index) => (
               <div key={index} className={styles.item}>
@@ -419,19 +461,19 @@ const Checkout = () => {
             <span>Subtotal</span>
             <span>${totalPrecio.toFixed(2)} MXN</span>
           </div>
-          
+
           {propinaMonto > 0 && (
             <div className={styles.totalRow}>
               <span>Propina</span>
               <span>${propinaMonto.toFixed(2)} MXN</span>
             </div>
           )}
-          
+
           <div className={styles.totalRow}>
             <span className={styles.envioTexto}>Envío</span>
             <span className={styles.envioPrecio}>Gratis</span>
           </div>
-          
+
           <div className={styles.totalGrande}>
             <span>Total a pagar</span>
             <span className={styles.totalMonto}>

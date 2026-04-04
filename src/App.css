@@ -3,12 +3,13 @@
 /* Variables globales - colores y breakpoints */
 :root {
   /* Colores principales */
-  --salmon-coral: #EE3F24;
-  --wasabi-green: #023820;
-  --olive-green: #235347;
-  --cream-rice: #FFF4E6;
-  --natural-beige: #FFEFCB;
-  --golden: #F9A11B;
+  --wasabi-green: #2f5d3a;
+  --olive-green: #6f7419;
+  --cream-rice: #fdf7ec;
+  --bamboo-brown: #8b7355;
+  --salmon-coral: #ff8a5e;
+  --natural-beige: #e3dbce;
+  --black-ebony: #1a1a1a;
   
   /* Breakpoints responsive */
   --breakpoint-sm: 576px;
@@ -48,9 +49,11 @@ body {
   line-height: 1.5;
   background-color: var(--cream-rice);
   overflow-x: hidden;
+  margin: 0;
+  padding: 0;
 }
 
-/* Layout principal */
+/* Layout principal - CORREGIDO: sin bordes ni márgenes blancos */
 .app {
   min-height: 100vh;
   display: flex;
@@ -59,15 +62,16 @@ body {
   background-color: var(--cream-rice);
   position: relative;
   overflow-x: hidden;
+  margin: 0;
+  padding: 0;
 }
 
 .main-content {
   flex: 1;
   width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0;
   background-color: var(--cream-rice);
+  margin: 0;
+  padding: 0;
 }
 
 /* Estilos para botones globales */
@@ -281,8 +285,9 @@ a:hover {
     max-width: 1400px;
   }
   
+  /* Eliminado el padding lateral en pantallas grandes */
   .main-content {
-    padding: 0 var(--spacing-lg);
+    padding: 0;
   }
 }
 
