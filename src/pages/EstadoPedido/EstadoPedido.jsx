@@ -126,76 +126,22 @@ const EstadoPedido = () => {
     }
   ];
 
-  // Cargar pedido desde el backend
-  const cargarPedido = useCallback(async () => {
-    if (!id || !isMounted.current) return;
-
-    try {
-      console.log('Cargando pedido número:', id);
-      // El id ya es el número de pedido (ej: "PED-1734567890123")
-      const response = await fetch(`http://localhost:8080/api/pedidos/buscar/${id}`);
-
-      if (response.ok) {
-        const data = await response.json();
-        if (isMounted.current) {
-          console.log('Pedido recibido:', data);
-          setPedido(data);
-          setError(null);
-        }
-      } else {
-        if (isMounted.current) {
-          setError('Pedido no encontrado');
-        }
-      }
-    } catch (err) {
-      console.error('Error al cargar pedido:', err);
-      if (isMounted.current) {
-        setError('Error al cargar el pedido');
-      }
-    } finally {
-      if (isMounted.current) {
-        setLoading(false);
+  // Función para cargar desde localStorage
+  const cargarPedidoDesdeLocalStorage = useCallback((numeroPedido) => {
+    console.log("Buscando en localStorage:", numeroPedido);
+    const pedidosGuardados = localStorage.getItem("pedidos");
+    if (pedidosGuardados) {
+      const pedidos = JSON.parse(pedidosGuardados);
+      const pedidoEncontrado = pedidos.find(p => p.numeroPedido === numeroPedido);
+      if (pedidoEncontrado) {
+        console.log("✅ Pedido encontrado en localStorage:", pedidoEncontrado);
+        return pedidoEncontrado;
       }
     }
-  }, [id]);
-
-  // Polling para actualizar el estado automáticamente cada 5 segundos
-  useEffect(() => {
-    isMounted.current = true;
-
-    // Cargar pedido inmediatamente
-    cargarPedido();
-
-    // Configurar polling
-    pollingIntervalRef.current = setInterval(() => {
-      if (isMounted.current) {
-        cargarPedido();
-      }
-    }, 5000);
-
-    return () => {
-      isMounted.current = false;
-      if (pollingIntervalRef.current) {
-        clearInterval(pollingIntervalRef.current);
-      }
-    };
-  }, [cargarPedido]);
-
-  // Datos curiosos - se inicializa solo una vez
-  useEffect(() => {
-    const randomDatoIndex = Math.floor(Math.random() * datosCuriosos.length);
-    setDatoCurioso(datosCuriosos[randomDatoIndex]);
-
-    const randomImagenIndex = Math.floor(Math.random() * imagenesChef.length);
-    setImagenChef(imagenesChef[randomImagenIndex]);
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
+    return null;
   }, []);
 
+  // Función para cambiar dato curioso
   const cambiarDatoCurioso = useCallback(() => {
     setAnimating(true);
 
@@ -218,7 +164,16 @@ const EstadoPedido = () => {
     setTimeout(() => {
       setAnimating(false);
     }, 500);
-  }, [datoCurioso, imagenChef, datosCuriosos, imagenesChef]);
+  }, [datoCurioso, imagenChef]);
+
+  // Inicializar datos curiosos
+  useEffect(() => {
+    const randomDatoIndex = Math.floor(Math.random() * datosCuriosos.length);
+    setDatoCurioso(datosCuriosos[randomDatoIndex]);
+
+    const randomImagenIndex = Math.floor(Math.random() * imagenesChef.length);
+    setImagenChef(imagenesChef[randomImagenIndex]);
+  }, []);
 
   // Timer para cambiar datos curiosos automáticamente
   useEffect(() => {
@@ -232,6 +187,91 @@ const EstadoPedido = () => {
       }
     };
   }, [cambiarDatoCurioso]);
+
+  // Cargar pedido (principal)
+  useEffect(() => {
+    isMounted.current = true;
+
+    const cargarPedido = async () => {
+      if (!id || !isMounted.current) return;
+
+      console.log('Cargando pedido número:', id);
+
+      // PRIMERO: Buscar en localStorage
+      const pedidoLocal = cargarPedidoDesdeLocalStorage(id);
+      
+      if (pedidoLocal) {
+        // Convertir formato local al formato que espera el componente
+        const pedidoFormateado = {
+          pedido: {
+            id: pedidoLocal.id,
+            numeroPedido: pedidoLocal.numeroPedido,
+            fechaPedido: pedidoLocal.fecha,
+            estado: pedidoLocal.estado,
+            total: pedidoLocal.total,
+            metodoPago: pedidoLocal.metodoPago,
+            comentarios: `Cliente: ${pedidoLocal.datosCliente?.nombre} - Tel: ${pedidoLocal.datosCliente?.telefono} - Dirección: ${pedidoLocal.datosCliente?.direccion}`
+          },
+          detalles: pedidoLocal.items?.map(item => ({
+            cantidad: item.cantidad,
+            nombreProducto: item.nombre,
+            precioUnitario: item.precio
+          })) || []
+        };
+        
+        if (isMounted.current) {
+          console.log('✅ Usando pedido de localStorage');
+          setPedido(pedidoFormateado);
+          setError(null);
+          setLoading(false);
+        }
+        return;
+      }
+
+      // SEGUNDO: Intentar con el backend
+      try {
+        const response = await fetch(`http://localhost:8080/api/pedidos/buscar/${id}`);
+
+        if (response.ok) {
+          const data = await response.json();
+          if (isMounted.current) {
+            console.log('✅ Pedido encontrado en backend:', data);
+            setPedido(data);
+            setError(null);
+          }
+        } else {
+          if (isMounted.current) {
+            setError('Pedido no encontrado');
+          }
+        }
+      } catch (err) {
+        console.error('Error al cargar pedido:', err);
+        if (isMounted.current) {
+          setError('Error al cargar el pedido');
+        }
+      } finally {
+        if (isMounted.current) {
+          setLoading(false);
+        }
+      }
+    };
+
+    cargarPedido();
+
+    // Configurar polling para actualizaciones
+    pollingIntervalRef.current = setInterval(() => {
+      if (isMounted.current && !cargarPedidoDesdeLocalStorage(id)) {
+        cargarPedido();
+      }
+    }, 5000);
+
+    return () => {
+      isMounted.current = false;
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+      }
+    };
+  }, [id, cargarPedidoDesdeLocalStorage]);
 
   if (loading) {
     return (

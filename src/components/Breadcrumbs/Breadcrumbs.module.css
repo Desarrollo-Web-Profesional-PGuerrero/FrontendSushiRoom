@@ -1,0 +1,72 @@
+/* src/components/Breadcrumbs/Breadcrumbs.module.css */
+
+.breadcrumbs {
+  background: linear-gradient(135deg, #fef9f5 0%, #fff5ef 100%);
+  padding: 0.8rem 0;
+  border-bottom: 1px solid #f0e6df;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+}
+
+.link {
+  color: #EE3F24;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: color 0.3s ease;
+}
+
+.link:hover {
+  color: #023820;
+  text-decoration: underline;
+}
+
+.homeIcon {
+  font-size: 0.9rem;
+}
+
+.separator {
+  color: #ccc;
+  margin: 0 0.5rem;
+  font-size: 1rem;
+}
+
+.current {
+  color: #666;
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1rem;
+    font-size: 0.75rem;
+  }
+  
+  .separator {
+    margin: 0 0.3rem;
+  }
+  
+  .homeIcon {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .breadcrumbs {
+    padding: 0.6rem 0;
+  }
+  
+  .container {
+    font-size: 0.7rem;
+  }
+}

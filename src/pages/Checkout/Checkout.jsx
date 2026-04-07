@@ -21,12 +21,14 @@ const Checkout = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
 
   // Cargar la propina del localStorage al montar el componente
   useEffect(() => {
     const savedPropina = localStorage.getItem("propina");
     const savedPropinaPersonalizada = localStorage.getItem("propinaPersonalizada");
-
+    
     if (savedPropina) {
       setPropina(JSON.parse(savedPropina));
     }
@@ -41,6 +43,84 @@ const Checkout = () => {
       return "35-45 minutos";
     }
     return "25-35 minutos";
+  };
+
+  // ==================== VALIDACIONES ====================
+  const validarNombre = (nombre) => {
+    if (!nombre || nombre.trim() === "") {
+      return "El nombre es obligatorio";
+    }
+    if (nombre.trim().length < 3) {
+      return "El nombre debe tener al menos 3 caracteres";
+    }
+    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(nombre)) {
+      return "El nombre solo puede contener letras";
+    }
+    return "";
+  };
+
+  const validarTelefono = (telefono) => {
+    if (!telefono || telefono.trim() === "") {
+      return "El teléfono es obligatorio";
+    }
+    const telefonoLimpio = telefono.replace(/\D/g, "");
+    if (telefonoLimpio.length !== 10) {
+      return "El teléfono debe tener 10 dígitos";
+    }
+    return "";
+  };
+
+  const validarDireccion = (direccion) => {
+    if (!direccion || direccion.trim() === "") {
+      return "La dirección es obligatoria";
+    }
+    if (direccion.trim().length < 5) {
+      return "La dirección debe ser más específica";
+    }
+    return "";
+  };
+
+  const validarNumeroTarjeta = (numero) => {
+    const numeroLimpio = numero.replace(/\s/g, "");
+    if (numeroLimpio.length !== 16) {
+      return "El número de tarjeta debe tener 16 dígitos";
+    }
+    return "";
+  };
+
+  const validarNombreTarjeta = (nombre) => {
+    if (!nombre || nombre.trim() === "") {
+      return "El nombre en la tarjeta es obligatorio";
+    }
+    return "";
+  };
+
+  const validarFechaExpiracion = (fecha) => {
+    if (!fecha || fecha.length !== 5) {
+      return "Ingresa una fecha válida (MM/AA)";
+    }
+    const [mes, anio] = fecha.split("/");
+    const mesNum = parseInt(mes, 10);
+    const anioNum = parseInt(anio, 10);
+    const fechaActual = new Date();
+    const anioActual = fechaActual.getFullYear() % 100;
+    const mesActual = fechaActual.getMonth() + 1;
+
+    if (mesNum < 1 || mesNum > 12) {
+      return "El mes debe ser entre 01 y 12";
+    }
+    if (anioNum < anioActual || (anioNum === anioActual && mesNum < mesActual)) {
+      return "La tarjeta está vencida";
+    }
+    return "";
+  };
+
+  const validarCVV = (cvv) => {
+    const cvvLimpio = cvv.replace(/\D/g, "");
+    if (cvvLimpio.length !== 3) {
+      return "El CVV debe tener 3 dígitos";
+    }
+    return "";
   };
 
   const calcularTotalConPropina = () => {
@@ -60,6 +140,9 @@ const Checkout = () => {
       const cleaned = value.replace(/\D/g, "").slice(0, 16);
       const formatted = cleaned.replace(/(\d{4})/g, "$1 ").trim();
       setFormData((prev) => ({ ...prev, [name]: formatted }));
+      if (touched[name]) {
+        setErrors(prev => ({ ...prev, [name]: validarNumeroTarjeta(formatted) }));
+      }
       return;
     }
 
@@ -69,34 +152,71 @@ const Checkout = () => {
         cleaned = cleaned.slice(0, 2) + "/" + cleaned.slice(2);
       }
       setFormData((prev) => ({ ...prev, [name]: cleaned }));
+      if (touched[name]) {
+        setErrors(prev => ({ ...prev, [name]: validarFechaExpiracion(cleaned) }));
+      }
       return;
     }
 
     if (name === "cvv") {
       const cleaned = value.replace(/\D/g, "").slice(0, 3);
       setFormData((prev) => ({ ...prev, [name]: cleaned }));
+      if (touched[name]) {
+        setErrors(prev => ({ ...prev, [name]: validarCVV(cleaned) }));
+      }
       return;
     }
 
     setFormData((prev) => ({ ...prev, [name]: value }));
+    
+    // Validar en tiempo real si el campo ya fue tocado
+    if (touched[name]) {
+      let errorMsg = "";
+      switch (name) {
+        case "nombre": errorMsg = validarNombre(value); break;
+        case "telefono": errorMsg = validarTelefono(value); break;
+        case "direccion": errorMsg = validarDireccion(value); break;
+        case "nombreTarjeta": errorMsg = validarNombreTarjeta(value); break;
+        default: break;
+      }
+      setErrors(prev => ({ ...prev, [name]: errorMsg }));
+    }
+  };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    setTouched(prev => ({ ...prev, [name]: true }));
+    
+    let errorMsg = "";
+    switch (name) {
+      case "nombre": errorMsg = validarNombre(value); break;
+      case "telefono": errorMsg = validarTelefono(value); break;
+      case "direccion": errorMsg = validarDireccion(value); break;
+      case "numeroTarjeta": errorMsg = validarNumeroTarjeta(value); break;
+      case "nombreTarjeta": errorMsg = validarNombreTarjeta(value); break;
+      case "fechaExpiracion": errorMsg = validarFechaExpiracion(value); break;
+      case "cvv": errorMsg = validarCVV(value); break;
+      default: break;
+    }
+    setErrors(prev => ({ ...prev, [name]: errorMsg }));
   };
 
   const validarTarjeta = () => {
-    const numeroLimpio = formData.numeroTarjeta.replace(/\s/g, "");
-    if (numeroLimpio.length !== 16) {
-      setError("Número de tarjeta inválido (debe tener 16 dígitos)");
-      return false;
-    }
-    if (formData.nombreTarjeta.trim() === "") {
-      setError("Nombre en la tarjeta es requerido");
-      return false;
-    }
-    if (formData.fechaExpiracion.length !== 5) {
-      setError("Fecha de expiración inválida (MM/AA)");
-      return false;
-    }
-    if (formData.cvv.length !== 3) {
-      setError("CVV inválido (3 dígitos)");
+    const numeroError = validarNumeroTarjeta(formData.numeroTarjeta);
+    const nombreError = validarNombreTarjeta(formData.nombreTarjeta);
+    const fechaError = validarFechaExpiracion(formData.fechaExpiracion);
+    const cvvError = validarCVV(formData.cvv);
+
+    setErrors(prev => ({
+      ...prev,
+      numeroTarjeta: numeroError,
+      nombreTarjeta: nombreError,
+      fechaExpiracion: fechaError,
+      cvv: cvvError
+    }));
+
+    if (numeroError || nombreError || fechaError || cvvError) {
+      setError("Por favor, verifica los datos de tu tarjeta");
       return false;
     }
     return true;
@@ -106,8 +226,32 @@ const Checkout = () => {
     e.preventDefault();
     setError("");
 
-    if (!formData.nombre || !formData.telefono || !formData.direccion) {
-      setError("Por favor, completa todos los campos requeridos");
+    // Validar campos básicos
+    const nombreError = validarNombre(formData.nombre);
+    const telefonoError = validarTelefono(formData.telefono);
+    const direccionError = validarDireccion(formData.direccion);
+
+    // Marcar todos como tocados
+    setTouched({
+      nombre: true,
+      telefono: true,
+      direccion: true,
+      ...(formData.metodoPago === "tarjeta" && {
+        numeroTarjeta: true,
+        nombreTarjeta: true,
+        fechaExpiracion: true,
+        cvv: true
+      })
+    });
+
+    setErrors({
+      nombre: nombreError,
+      telefono: telefonoError,
+      direccion: direccionError
+    });
+
+    if (nombreError || telefonoError || direccionError) {
+      setError("Por favor, completa todos los campos requeridos correctamente");
       return;
     }
 
@@ -120,50 +264,16 @@ const Checkout = () => {
     setIsSubmitting(true);
 
     try {
-      const propinaMonto = propina > 0
-        ? (totalPrecio * propina) / 100
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      localStorage.setItem("userName", formData.nombre.split(" ")[0]);
+
+      const propinaMonto = propina > 0 
+        ? (totalPrecio * propina) / 100 
         : (propinaPersonalizada && parseFloat(propinaPersonalizada) > 0 ? parseFloat(propinaPersonalizada) : 0);
 
-      // Preparar los items para el backend
-      const itemsParaBackend = carrito.map(item => ({
-        productoId: item.id,
-        nombreProducto: item.nombre,
-        cantidad: item.cantidad,
-        precio: item.precio
-      }));
-
-      // Datos del pedido para el backend
-      const datosPedido = {
-        metodoPago: formData.metodoPago === "efectivo" ? "Efectivo" :
-          formData.metodoPago === "tarjeta" ? "Tarjeta" : "Transferencia",
-        comentarios: `Cliente: ${formData.nombre} - Tel: ${formData.telefono} - Dirección: ${formData.direccion}`,
-        items: itemsParaBackend
-      };
-
-      console.log("Enviando pedido al backend:", datosPedido);
-
-      // Enviar al backend
-      // En Checkout.jsx, después de crear el pedido
-      const response = await fetch('http://localhost:8080/api/pedidos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(datosPedido)
-      });
-
-      const data = await response.json();
-
-      if (data.success && data.pedido) {
-        // Redirigir con el ID del pedido
-        navigate(`/estado-pedido/${data.pedido.id}`);
-      }
-      if (!response.ok) {
-        throw new Error(data.message || "Error al crear el pedido");
-      }
-
-      // Guardar también en localStorage para compatibilidad
       const nuevoPedido = {
-        id: data.pedido?.id || Date.now(),
-        numeroPedido: data.pedido?.numeroPedido || `PED-${Date.now()}`,
+        id: Date.now(),
         fecha: new Date().toISOString(),
         items: carrito.map((item) => ({
           id: item.id,
@@ -180,7 +290,7 @@ const Checkout = () => {
         propina: propinaMonto,
         total: totalPrecio + propinaMonto,
         tiempoEstimado: getTiempoEstimado(),
-        estado: "pendiente",
+        estado: "confirmado",
         metodoPago: formData.metodoPago,
         datosCliente: {
           nombre: formData.nombre,
@@ -194,41 +304,25 @@ const Checkout = () => {
       pedidos.push(nuevoPedido);
       localStorage.setItem("pedidos", JSON.stringify(pedidos));
 
-      // Limpiar la propina del localStorage después de realizar el pedido
       localStorage.removeItem("propina");
       localStorage.removeItem("propinaPersonalizada");
 
       vaciarCarrito();
-
       setIsSubmitting(false);
 
       navigate("/confirmacion", {
         state: {
           pedido: {
             id: nuevoPedido.id,
-            numeroPedido: nuevoPedido.numeroPedido,
             tiempoEstimado: nuevoPedido.tiempoEstimado,
             total: nuevoPedido.total,
             productos: nuevoPedido.productos,
           },
         },
       });
-      navigate(`/estado-pedido/${data.pedido.numeroPedido}`, {
-        state: {
-          pedido: {
-            id: data.pedido.id,
-            numeroPedido: data.pedido.numeroPedido,
-            tiempoEstimado: getTiempoEstimado(),
-            total: totalPrecio + propinaMonto,
-            productos: carrito.map(item => ({ nombre: item.nombre, cantidad: item.cantidad })),
-          },
-        },
-      });
     } catch (err) {
       console.error("Error al procesar el pedido:", err);
-      setError(
-        err.message || "Ocurrió un error al procesar tu pedido. Por favor, intenta de nuevo."
-      );
+      setError("Ocurrió un error al procesar tu pedido. Por favor, intenta de nuevo.");
       setIsSubmitting(false);
     }
   };
@@ -248,8 +342,8 @@ const Checkout = () => {
     );
   }
 
-  const propinaMonto = propina > 0
-    ? (totalPrecio * propina) / 100
+  const propinaMonto = propina > 0 
+    ? (totalPrecio * propina) / 100 
     : (propinaPersonalizada && parseFloat(propinaPersonalizada) > 0 ? parseFloat(propinaPersonalizada) : 0);
 
   return (
@@ -270,47 +364,60 @@ const Checkout = () => {
 
           <form onSubmit={handleSubmit} className={styles.form}>
             <div className={styles.formGroup}>
-              <label>Nombre completo</label>
+              <label>Nombre completo *</label>
               <input
                 type="text"
                 name="nombre"
                 value={formData.nombre}
                 onChange={handleChange}
-                required
+                onBlur={handleBlur}
                 placeholder="Tu nombre"
+                className={touched.nombre && errors.nombre ? styles.inputError : ""}
               />
+              {touched.nombre && errors.nombre && (
+                <span className={styles.errorText}>{errors.nombre}</span>
+              )}
             </div>
 
             <div className={styles.formGroup}>
-              <label>Teléfono</label>
+              <label>Teléfono *</label>
               <input
                 type="tel"
                 name="telefono"
                 value={formData.telefono}
                 onChange={handleChange}
-                required
+                onBlur={handleBlur}
                 placeholder="Tu teléfono"
+                className={touched.telefono && errors.telefono ? styles.inputError : ""}
               />
+              {touched.telefono && errors.telefono && (
+                <span className={styles.errorText}>{errors.telefono}</span>
+              )}
             </div>
 
             <div className={styles.formGroup}>
-              <label>Dirección de entrega</label>
+              <label>Dirección de entrega *</label>
               <input
                 type="text"
                 name="direccion"
                 value={formData.direccion}
                 onChange={handleChange}
-                required
+                onBlur={handleBlur}
                 placeholder="Calle, número, colonia"
+                className={touched.direccion && errors.direccion ? styles.inputError : ""}
               />
+              {touched.direccion && errors.direccion && (
+                <span className={styles.errorText}>{errors.direccion}</span>
+              )}
             </div>
 
             <div className={styles.formGroup}>
-              <label>Método de pago</label>
+              <label>Método de pago *</label>
               <div className={styles.paymentMethods}>
                 <label
-                  className={`${styles.paymentOption} ${formData.metodoPago === "efectivo" ? styles.paymentActive : ""
-                    }`}
+                  className={`${styles.paymentOption} ${
+                    formData.metodoPago === "efectivo" ? styles.paymentActive : ""
+                  }`}
                 >
                   <input
                     type="radio"
@@ -319,11 +426,12 @@ const Checkout = () => {
                     checked={formData.metodoPago === "efectivo"}
                     onChange={handleChange}
                   />
-                  <span>Efectivo</span>
+                  <span>💵 Efectivo</span>
                 </label>
                 <label
-                  className={`${styles.paymentOption} ${formData.metodoPago === "tarjeta" ? styles.paymentActive : ""
-                    }`}
+                  className={`${styles.paymentOption} ${
+                    formData.metodoPago === "tarjeta" ? styles.paymentActive : ""
+                  }`}
                 >
                   <input
                     type="radio"
@@ -332,11 +440,12 @@ const Checkout = () => {
                     checked={formData.metodoPago === "tarjeta"}
                     onChange={handleChange}
                   />
-                  <span>Tarjeta de crédito/débito</span>
+                  <span>💳 Tarjeta de crédito/débito</span>
                 </label>
                 <label
-                  className={`${styles.paymentOption} ${formData.metodoPago === "transferencia" ? styles.paymentActive : ""
-                    }`}
+                  className={`${styles.paymentOption} ${
+                    formData.metodoPago === "transferencia" ? styles.paymentActive : ""
+                  }`}
                 >
                   <input
                     type="radio"
@@ -345,7 +454,7 @@ const Checkout = () => {
                     checked={formData.metodoPago === "transferencia"}
                     onChange={handleChange}
                   />
-                  <span>Transferencia bancaria</span>
+                  <span>🏦 Transferencia bancaria</span>
                 </label>
               </div>
             </div>
@@ -355,51 +464,71 @@ const Checkout = () => {
                 <h3>Datos de la tarjeta</h3>
 
                 <div className={styles.formGroup}>
-                  <label>Número de tarjeta</label>
+                  <label>Número de tarjeta *</label>
                   <input
                     type="text"
                     name="numeroTarjeta"
                     value={formData.numeroTarjeta}
                     onChange={handleChange}
+                    onBlur={handleBlur}
                     placeholder="**** **** **** ****"
                     maxLength="19"
+                    className={touched.numeroTarjeta && errors.numeroTarjeta ? styles.inputError : ""}
                   />
+                  {touched.numeroTarjeta && errors.numeroTarjeta && (
+                    <span className={styles.errorText}>{errors.numeroTarjeta}</span>
+                  )}
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label>Nombre en la tarjeta</label>
+                  <label>Nombre en la tarjeta *</label>
                   <input
                     type="text"
                     name="nombreTarjeta"
                     value={formData.nombreTarjeta}
                     onChange={handleChange}
+                    onBlur={handleBlur}
                     placeholder="Como aparece en la tarjeta"
+                    className={touched.nombreTarjeta && errors.nombreTarjeta ? styles.inputError : ""}
                   />
+                  {touched.nombreTarjeta && errors.nombreTarjeta && (
+                    <span className={styles.errorText}>{errors.nombreTarjeta}</span>
+                  )}
                 </div>
 
                 <div className={styles.tarjetaRow}>
                   <div className={styles.formGroup}>
-                    <label>Fecha expiración</label>
+                    <label>Fecha expiración *</label>
                     <input
                       type="text"
                       name="fechaExpiracion"
                       value={formData.fechaExpiracion}
                       onChange={handleChange}
+                      onBlur={handleBlur}
                       placeholder="MM/AA"
                       maxLength="5"
+                      className={touched.fechaExpiracion && errors.fechaExpiracion ? styles.inputError : ""}
                     />
+                    {touched.fechaExpiracion && errors.fechaExpiracion && (
+                      <span className={styles.errorText}>{errors.fechaExpiracion}</span>
+                    )}
                   </div>
 
                   <div className={styles.formGroup}>
-                    <label>CVV</label>
+                    <label>CVV *</label>
                     <input
                       type="text"
                       name="cvv"
                       value={formData.cvv}
                       onChange={handleChange}
+                      onBlur={handleBlur}
                       placeholder="***"
                       maxLength="3"
+                      className={touched.cvv && errors.cvv ? styles.inputError : ""}
                     />
+                    {touched.cvv && errors.cvv && (
+                      <span className={styles.errorText}>{errors.cvv}</span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -442,7 +571,7 @@ const Checkout = () => {
             <div className={styles.titleIcon}></div>
             <h2>Resumen del pedido</h2>
           </div>
-
+          
           <div className={styles.itemsList}>
             {carrito.map((item, index) => (
               <div key={index} className={styles.item}>
@@ -461,19 +590,19 @@ const Checkout = () => {
             <span>Subtotal</span>
             <span>${totalPrecio.toFixed(2)} MXN</span>
           </div>
-
+          
           {propinaMonto > 0 && (
             <div className={styles.totalRow}>
               <span>Propina</span>
               <span>${propinaMonto.toFixed(2)} MXN</span>
             </div>
           )}
-
+          
           <div className={styles.totalRow}>
             <span className={styles.envioTexto}>Envío</span>
             <span className={styles.envioPrecio}>Gratis</span>
           </div>
-
+          
           <div className={styles.totalGrande}>
             <span>Total a pagar</span>
             <span className={styles.totalMonto}>

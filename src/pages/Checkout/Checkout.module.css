@@ -536,5 +536,18 @@
   font-style: italic;
   color: #b0a088;
 }
-  
+ 
+
+/* Estilos para errores */
+.inputError {
+  border-color: #EE3F24 !important;
+  background-color: rgba(238, 63, 36, 0.05) !important;
+}
+
+.errorText {
+  color: #EE3F24;
+  font-size: 0.75rem;
+  margin-top: 4px;
+  display: block;
+}
 }
