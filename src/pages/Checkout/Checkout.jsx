@@ -24,6 +24,17 @@ const Checkout = () => {
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
 
+  // Función para generar número de pedido con formato PED-YYYYMMDD-XXXX
+  const generarNumeroPedido = () => {
+    const ahora = new Date();
+    const año = ahora.getFullYear();
+    const mes = String(ahora.getMonth() + 1).padStart(2, '0');
+    const dia = String(ahora.getDate()).padStart(2, '0');
+    const fecha = `${año}${mes}${dia}`;
+    const aleatorio = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    return `PED-${fecha}-${aleatorio}`;
+  };
+
   // Cargar la propina del localStorage al montar el componente
   useEffect(() => {
     const savedPropina = localStorage.getItem("propina");
@@ -169,7 +180,6 @@ const Checkout = () => {
 
     setFormData((prev) => ({ ...prev, [name]: value }));
     
-    // Validar en tiempo real si el campo ya fue tocado
     if (touched[name]) {
       let errorMsg = "";
       switch (name) {
@@ -226,12 +236,10 @@ const Checkout = () => {
     e.preventDefault();
     setError("");
 
-    // Validar campos básicos
     const nombreError = validarNombre(formData.nombre);
     const telefonoError = validarTelefono(formData.telefono);
     const direccionError = validarDireccion(formData.direccion);
 
-    // Marcar todos como tocados
     setTouched({
       nombre: true,
       telefono: true,
@@ -272,7 +280,11 @@ const Checkout = () => {
         ? (totalPrecio * propina) / 100 
         : (propinaPersonalizada && parseFloat(propinaPersonalizada) > 0 ? parseFloat(propinaPersonalizada) : 0);
 
+      // Generar número de pedido con el formato correcto
+      const numeroPedido = generarNumeroPedido();
+
       const nuevoPedido = {
+        numeroPedido: numeroPedido,
         id: Date.now(),
         fecha: new Date().toISOString(),
         items: carrito.map((item) => ({
@@ -290,7 +302,7 @@ const Checkout = () => {
         propina: propinaMonto,
         total: totalPrecio + propinaMonto,
         tiempoEstimado: getTiempoEstimado(),
-        estado: "confirmado",
+        estado: "pendiente",
         metodoPago: formData.metodoPago,
         datosCliente: {
           nombre: formData.nombre,
@@ -298,6 +310,8 @@ const Checkout = () => {
           direccion: formData.direccion,
         },
       };
+
+      console.log("📦 Pedido creado:", nuevoPedido);
 
       const pedidosGuardados = localStorage.getItem("pedidos");
       let pedidos = pedidosGuardados ? JSON.parse(pedidosGuardados) : [];
@@ -313,7 +327,7 @@ const Checkout = () => {
       navigate("/confirmacion", {
         state: {
           pedido: {
-            id: nuevoPedido.id,
+            id: numeroPedido,
             tiempoEstimado: nuevoPedido.tiempoEstimado,
             total: nuevoPedido.total,
             productos: nuevoPedido.productos,
