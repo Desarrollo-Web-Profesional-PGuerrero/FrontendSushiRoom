@@ -72,11 +72,6 @@
   text-align: center;
 }
 
-.logoIcon {
-  font-size: 3rem;
-  margin-bottom: 0.5rem;
-}
-
 .logo h2 {
   font-size: 1.3rem;
   font-weight: 600;
@@ -95,9 +90,70 @@
   white-space: nowrap;
 }
 
+/* Información del admin en el sidebar */
+.adminInfo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  margin: 0.5rem 1rem;
+  background: rgba(255, 138, 94, 0.1);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 138, 94, 0.2);
+}
+
+.adminAvatar {
+  width: 48px;
+  height: 48px;
+  background: #f0e0da;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.adminDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  overflow: hidden;
+}
+
+.adminName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.adminEmail {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.adminRole {
+  font-size: 0.65rem;
+  color: #ff8a5e;
+  background: rgba(255, 138, 94, 0.2);
+  padding: 0.2rem 0.5rem;
+  border-radius: 50px;
+  display: inline-block;
+  width: fit-content;
+}
+
 .nav {
   flex: 1;
   padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .navItem {
@@ -122,13 +178,14 @@
 }
 
 .navItem:hover {
-  background: rgba(255, 138, 94, 0.1);
-  color: #ff8a5e;
+  background: rgba(235, 233, 124, 0.884);
+  color: #2c2e1f;
 }
 
 .navItemActive {
-  background: rgba(255, 138, 94, 0.15);
-  color: #ff8a5e;
+  background: rgba(235, 233, 124, 0.705);
+  color: #0c0908;
+  border-left: 3px solid #cfff5e;
 }
 
 .logoutBtn {
@@ -137,10 +194,10 @@
   gap: 0.8rem;
   margin: 1.5rem;
   padding: 0.8rem 1rem;
-  background: transparent;
-  border: 1px solid rgba(255, 138, 94, 0.3);
+  background: rgba(255, 17, 17, 0.76);
+  border: 1px solid rgba(100, 9, 9, 0.918);
   border-radius: 12px;
-  color: #ff8a5e;
+  color: #471706;
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -153,8 +210,8 @@
 }
 
 .logoutBtn:hover {
-  background: #ff8a5e;
-  border-color: #ff8a5e;
+  background: rgb(255, 0, 0);
+  border-color: #ff1b1b;
   color: #1a1a1a;
 }
 
@@ -223,6 +280,14 @@
   overflow: hidden;
 }
 
+.usuariosSection {
+  margin-top: 2rem;
+  background: white;
+  border-radius: 24px;
+  border: 1px solid #e3dbce;
+  overflow: hidden;
+}
+
 .sectionHeader {
   display: flex;
   justify-content: space-between;
@@ -274,7 +339,8 @@
 }
 
 /* Formulario */
-.form {
+.form,
+.userForm {
   padding: 1.5rem;
   border-bottom: 1px solid #e3dbce;
   background: #fafaf5;
@@ -318,10 +384,6 @@
   gap: 0.4rem;
 }
 
-.formGroupCheckbox {
-  grid-column: span 2;
-}
-
 .formGroup label {
   font-size: 0.7rem;
   font-weight: 500;
@@ -349,20 +411,126 @@
   box-shadow: 0 0 0 2px rgba(26, 26, 26, 0.05);
 }
 
-.checkboxLabel {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-  font-size: 0.85rem;
-  color: #2f5d3a;
+/* Password wrapper - estilos mejorados */
+.passwordWrapper {
+  position: relative;
+  width: 100%;
 }
 
-.checkboxLabel input {
-  width: 16px;
-  height: 16px;
+.passwordWrapper input {
+  width: 100%;
+  padding-right: 45px;
+}
+
+.togglePasswordBtn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
   cursor: pointer;
-  accent-color: #ff8a5e;
+  font-size: 1.1rem;
+  padding: 0;
+  color: #8b7355;
+  transition: all 0.3s ease;
+}
+
+.togglePasswordBtn:hover {
+  color: #ff8a5e;
+}
+
+/* Estilos para múltiples selecciones */
+.multiSelectContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.selectWrapper {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.selectInput {
+  flex: 1;
+  padding: 0.7rem 1rem;
+  border: 1px solid #e3dbce;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  background: white;
+  font-family: inherit;
+}
+
+.selectInput:focus {
+  outline: none;
+  border-color: #ff8a5e;
+}
+
+.addBtn {
+  padding: 0.7rem 1.2rem;
+  background: #1a1a1a;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-weight: 500;
+}
+
+.addBtn:hover {
+  background: #ff8a5e;
+  transform: translateY(-1px);
+}
+
+.tagsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.25rem 0;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.8rem;
+  background: rgba(255, 138, 94, 0.15);
+  color: #ff8a5e;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.tagRemove {
+  background: none;
+  border: none;
+  color: #ff8a5e;
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+}
+
+.tagRemove:hover {
+  color: #e94560;
+  transform: scale(1.1);
+}
+
+.customInput {
+  padding: 0.7rem 1rem;
+  border: 1px solid #e3dbce;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+  font-family: inherit;
+}
+
+.customInput:focus {
+  outline: none;
+  border-color: #ff8a5e;
 }
 
 .formActions {
@@ -486,8 +654,8 @@
   border: none;
   font-size: 1rem;
   cursor: pointer;
-  padding: 0.25rem;
-  border-radius: 8px;
+  padding: 0.5rem;
+  border-radius: 10px;
   transition: all 0.3s ease;
 }
 
@@ -510,12 +678,261 @@
   transform: scale(1.1);
 }
 
-/* ============================================ */
-/* RESPONSIVE - MÓVIL */
-/* ============================================ */
-@media (max-width: 768px) {
+.emptyTableRow {
+  text-align: center;
+  padding: 2rem;
+  color: #8b7355;
+}
 
-  /* Mostrar botón hamburguesa */
+/* ============================================ */
+/* SECCIÓN DE PEDIDOS - ESTILOS MEJORADOS */
+/* ============================================ */
+
+.pedidosSection {
+  background: white;
+  border-radius: 24px;
+  border: 1px solid #e3dbce;
+  overflow: hidden;
+}
+
+/* Tarjetas de resumen - diseño sin emojis */
+.resumenContainer {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  padding: 1.5rem;
+  background: #FAFAFA;
+  border-bottom: 1px solid #e3dbce;
+}
+
+.resumenCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.2rem;
+  border-radius: 16px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: default;
+}
+
+.resumenCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.resumenNumero {
+  font-size: 2rem;
+  font-weight: 700;
+  display: block;
+  line-height: 1;
+}
+
+.resumenLabel {
+  font-size: 0.7rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-top: 0.25rem;
+}
+
+/* Filtros sin emojis */
+.filtrosContainer {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e3dbce;
+  flex-wrap: wrap;
+  background: white;
+}
+
+.filtroBtn {
+  padding: 0.5rem 1rem;
+  background: #F5F5F5;
+  border: 1px solid #E0E0E0;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #555;
+}
+
+.filtroBtn:hover {
+  background: #EEEEEE;
+  border-color: #CCCCCC;
+}
+
+.filtroActivo {
+  background: #1a1a1a;
+  border-color: #1a1a1a;
+  color: white;
+}
+
+/* Grid de pedidos */
+.pedidosGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 1.5rem;
+  padding: 1.5rem;
+}
+
+/* Tarjeta de pedido */
+.pedidoCard {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #e3dbce;
+  padding: 1.2rem;
+  transition: all 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.pedidoCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.pedidoHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e3dbce;
+}
+
+.pedidoNumero {
+  font-weight: 700;
+  color: #1a1a1a;
+  font-size: 0.9rem;
+}
+
+.pedidoFecha {
+  font-size: 0.7rem;
+  color: #8b7355;
+  display: block;
+  margin-top: 0.2rem;
+}
+
+.pedidoEstado {
+  padding: 0.2rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: white;
+}
+
+.pedidoInfo {
+  margin-bottom: 1rem;
+}
+
+.pedidoInfo div {
+  margin-bottom: 0.3rem;
+  font-size: 0.85rem;
+}
+
+.pedidoInfo strong {
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+/* Botones de acción */
+.pedidoAcciones {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btnDetalles {
+  flex: 1;
+  padding: 0.5rem;
+  background: #F5F5F5;
+  color: #333;
+  border: 1px solid #E0E0E0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btnDetalles:hover {
+  background: #E0E0E0;
+}
+
+.btnPreparar {
+  flex: 1;
+  padding: 0.5rem;
+  background: #FF9800;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btnPreparar:hover {
+  background: #F57C00;
+}
+
+.btnListo {
+  flex: 1;
+  padding: 0.5rem;
+  background: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btnListo:hover {
+  background: #1976D2;
+}
+
+.btnEntregar {
+  flex: 1;
+  padding: 0.5rem;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btnEntregar:hover {
+  background: #388E3C;
+}
+
+.loadingState {
+  text-align: center;
+  padding: 3rem;
+  color: #8b7355;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 3rem;
+  color: #8b7355;
+  background: #FAFAFA;
+  border-radius: 16px;
+  margin: 1.5rem;
+}
+
+/* ============================================ */
+/* RESPONSIVE */
+/* ============================================ */
+
+@media (max-width: 768px) {
   .menuHamburger {
     display: flex;
     align-items: center;
@@ -526,7 +943,6 @@
     display: block;
   }
 
-  /* Sidebar oculto por defecto en móvil */
   .sidebar {
     position: fixed;
     top: 0;
@@ -538,12 +954,10 @@
     transition: transform 0.3s ease;
   }
 
-  /* Sidebar visible cuando está abierto */
   .sidebarOpen {
     transform: translateX(0);
   }
 
-  /* Contenido ocupa todo el ancho */
   .content {
     padding: 1rem;
     margin-left: 0;
@@ -556,6 +970,8 @@
 
   .contentHeader {
     margin-top: 50px;
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .formGrid {
@@ -566,11 +982,6 @@
     grid-column: span 1;
   }
 
-  .formGroupCheckbox {
-    grid-column: span 1;
-  }
-
-  /* Tabla responsive */
   .table thead {
     display: none;
   }
@@ -607,18 +1018,36 @@
     justify-content: flex-end;
   }
 
-  /* Estilos para gestión de usuarios */
-  .usuariosSection {
-    margin-top: 2rem;
-    background: white;
-    border-radius: 24px;
-    border: 1px solid #e3dbce;
-    overflow: hidden;
+  .selectWrapper {
+    flex-direction: column;
   }
 
-  .userForm {
-    padding: 1.5rem;
-    border-bottom: 1px solid #e3dbce;
-    background: #fafaf5;
+  .adminInfo {
+    margin: 0.5rem;
+    padding: 1rem;
+  }
+
+  .adminAvatar {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+
+  /* Responsive para pedidos */
+  .resumenContainer {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .pedidosGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .filtrosContainer {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+  
+  .filtroBtn {
+    white-space: nowrap;
   }
 }

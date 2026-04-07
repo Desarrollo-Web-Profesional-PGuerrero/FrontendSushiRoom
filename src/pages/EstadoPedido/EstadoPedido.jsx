@@ -1,19 +1,35 @@
-// src/pages/EstadoPedido/EstadoPedido.jsx
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { usePedido } from '../../hooks/usePedido';
-import TimelinePedido from '../../components/TimelinePedido/TimelinePedido';
 import styles from './EstadoPedido.module.css';
 
 const EstadoPedido = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { pedidoActivo, loading, obtenerPedido, pasos } = usePedido();
-  
+
+  const [pedido, setPedido] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [datoCurioso, setDatoCurioso] = useState(null);
   const [animating, setAnimating] = useState(false);
   const [imagenChef, setImagenChef] = useState('');
   const intervalRef = useRef(null);
+  const pollingIntervalRef = useRef(null);
+  const isMounted = useRef(true);
+
+  // Estados del pedido
+  const estados = {
+    pendiente: { label: 'Pendiente', color: '#ff9800', icon: '⏳', paso: 1 },
+    preparacion: { label: 'En preparación', color: '#2196f3', icon: '👨‍🍳', paso: 2 },
+    listo: { label: 'Listo para entregar', color: '#4caf50', icon: '✅', paso: 3 },
+    entregado: { label: 'Entregado', color: '#9e9e9e', icon: '📦', paso: 4 }
+  };
+
+  const pasos = [
+    { estado: 'pendiente', label: 'Pedido recibido', icon: '⏳' },
+    { estado: 'preparacion', label: 'En preparación', icon: '👨‍🍳' },
+    { estado: 'listo', label: 'Listo para entregar', icon: '✅' },
+    { estado: 'entregado', label: 'Entregado', icon: '📦' }
+  ];
 
   const imagenesChef = [
     "https://tse4.mm.bing.net/th/id/OIP.ZROPqiLCuL-KQc6-warR9AHaE7?rs=1&pid=ImgDetMain&o=7&rm=3",
@@ -110,63 +126,152 @@ const EstadoPedido = () => {
     }
   ];
 
+  // Función para cargar desde localStorage
+  const cargarPedidoDesdeLocalStorage = useCallback((numeroPedido) => {
+    console.log("Buscando en localStorage:", numeroPedido);
+    const pedidosGuardados = localStorage.getItem("pedidos");
+    if (pedidosGuardados) {
+      const pedidos = JSON.parse(pedidosGuardados);
+      const pedidoEncontrado = pedidos.find(p => p.numeroPedido === numeroPedido);
+      if (pedidoEncontrado) {
+        console.log("✅ Pedido encontrado en localStorage:", pedidoEncontrado);
+        return pedidoEncontrado;
+      }
+    }
+    return null;
+  }, []);
+
+  // Función para cambiar dato curioso
   const cambiarDatoCurioso = useCallback(() => {
     setAnimating(true);
-    
+
     let nuevoDato;
     do {
       const randomIndex = Math.floor(Math.random() * datosCuriosos.length);
       nuevoDato = datosCuriosos[randomIndex];
     } while (datoCurioso && nuevoDato.id === datoCurioso.id && datosCuriosos.length > 1);
-    
+
     setDatoCurioso(nuevoDato);
-    
+
     let nuevaImagen;
     do {
       const randomIndex = Math.floor(Math.random() * imagenesChef.length);
       nuevaImagen = imagenesChef[randomIndex];
     } while (nuevaImagen === imagenChef && imagenesChef.length > 1);
-    
+
     setImagenChef(nuevaImagen);
-    
+
     setTimeout(() => {
       setAnimating(false);
     }, 500);
   }, [datoCurioso, imagenChef]);
 
-  useEffect(() => {
-    const cargarPedido = async () => {
-      if (id) {
-        console.log('Cargando pedido ID:', id);
-        const pedido = await obtenerPedido(parseInt(id));
-        if (!pedido) {
-          console.log('Pedido no encontrado, redirigiendo');
-          navigate('/');
-        }
-      }
-    };
-    
-    cargarPedido();
-  }, [id, obtenerPedido, navigate]);
-
+  // Inicializar datos curiosos
   useEffect(() => {
     const randomDatoIndex = Math.floor(Math.random() * datosCuriosos.length);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDatoCurioso(datosCuriosos[randomDatoIndex]);
-    
+
     const randomImagenIndex = Math.floor(Math.random() * imagenesChef.length);
     setImagenChef(imagenesChef[randomImagenIndex]);
-    
+  }, []);
+
+  // Timer para cambiar datos curiosos automáticamente
+  useEffect(() => {
     intervalRef.current = setInterval(() => {
       cambiarDatoCurioso();
     }, 15000);
-    
+
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
       }
     };
-  }, []);
+  }, [cambiarDatoCurioso]);
+
+  // Cargar pedido (principal)
+  useEffect(() => {
+    isMounted.current = true;
+
+    const cargarPedido = async () => {
+      if (!id || !isMounted.current) return;
+
+      console.log('Cargando pedido número:', id);
+
+      // PRIMERO: Buscar en localStorage
+      const pedidoLocal = cargarPedidoDesdeLocalStorage(id);
+      
+      if (pedidoLocal) {
+        // Convertir formato local al formato que espera el componente
+        const pedidoFormateado = {
+          pedido: {
+            id: pedidoLocal.id,
+            numeroPedido: pedidoLocal.numeroPedido,
+            fechaPedido: pedidoLocal.fecha,
+            estado: pedidoLocal.estado,
+            total: pedidoLocal.total,
+            metodoPago: pedidoLocal.metodoPago,
+            comentarios: `Cliente: ${pedidoLocal.datosCliente?.nombre} - Tel: ${pedidoLocal.datosCliente?.telefono} - Dirección: ${pedidoLocal.datosCliente?.direccion}`
+          },
+          detalles: pedidoLocal.items?.map(item => ({
+            cantidad: item.cantidad,
+            nombreProducto: item.nombre,
+            precioUnitario: item.precio
+          })) || []
+        };
+        
+        if (isMounted.current) {
+          console.log('✅ Usando pedido de localStorage');
+          setPedido(pedidoFormateado);
+          setError(null);
+          setLoading(false);
+        }
+        return;
+      }
+
+      // SEGUNDO: Intentar con el backend
+      try {
+        const response = await fetch(`http://localhost:8080/api/pedidos/buscar/${id}`);
+
+        if (response.ok) {
+          const data = await response.json();
+          if (isMounted.current) {
+            console.log('✅ Pedido encontrado en backend:', data);
+            setPedido(data);
+            setError(null);
+          }
+        } else {
+          if (isMounted.current) {
+            setError('Pedido no encontrado');
+          }
+        }
+      } catch (err) {
+        console.error('Error al cargar pedido:', err);
+        if (isMounted.current) {
+          setError('Error al cargar el pedido');
+        }
+      } finally {
+        if (isMounted.current) {
+          setLoading(false);
+        }
+      }
+    };
+
+    cargarPedido();
+
+    // Configurar polling para actualizaciones
+    pollingIntervalRef.current = setInterval(() => {
+      if (isMounted.current && !cargarPedidoDesdeLocalStorage(id)) {
+        cargarPedido();
+      }
+    }, 5000);
+
+    return () => {
+      isMounted.current = false;
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+      }
+    };
+  }, [id, cargarPedidoDesdeLocalStorage]);
 
   if (loading) {
     return (
@@ -176,10 +281,11 @@ const EstadoPedido = () => {
     );
   }
 
-  if (!pedidoActivo) {
+  if (error || !pedido) {
     return (
       <div className={styles.error}>
         <h2>Pedido no encontrado</h2>
+        <p>No pudimos encontrar tu pedido. Verifica el número de seguimiento.</p>
         <button onClick={() => navigate('/')} className={styles.button}>
           Volver al inicio
         </button>
@@ -187,21 +293,27 @@ const EstadoPedido = () => {
     );
   }
 
-  const fechaFormateada = new Date(pedidoActivo.fecha).toLocaleString('es-ES', {
-    dateStyle: 'full',
-    timeStyle: 'short'
-  });
+  const pedidoData = pedido.pedido;
+  const detalles = pedido.detalles || [];
+  const estadoActual = pedidoData?.estado || 'pendiente';
+
+  const pasoActual = estados[estadoActual]?.paso || 1;
+
+  const fechaFormateada = pedidoData?.fechaPedido
+    ? new Date(pedidoData.fechaPedido).toLocaleString('es-ES', {
+      dateStyle: 'full',
+      timeStyle: 'short'
+    })
+    : 'Fecha no disponible';
 
   const getTiempoEstimado = () => {
-    switch(pedidoActivo.estado) {
-      case 'confirmado':
+    switch (estadoActual) {
+      case 'pendiente':
         return 'Tiempo estimado: 5-10 minutos';
       case 'preparacion':
         return 'Tiempo estimado: 15-20 minutos';
       case 'listo':
         return 'Tu pedido está listo para entregar';
-      case 'en_camino':
-        return 'Tu pedido está en camino';
       case 'entregado':
         return '¡Disfruta tu sushi!';
       default:
@@ -210,7 +322,8 @@ const EstadoPedido = () => {
   };
 
   const getMetodoPagoTexto = () => {
-    switch(pedidoActivo.metodoPago) {
+    const metodo = pedidoData?.metodoPago;
+    switch (metodo) {
       case 'efectivo':
         return 'Efectivo';
       case 'tarjeta':
@@ -218,8 +331,14 @@ const EstadoPedido = () => {
       case 'transferencia':
         return 'Transferencia';
       default:
-        return pedidoActivo.metodoPago;
+        return metodo || 'No especificado';
     }
+  };
+
+  const getNombreCliente = () => {
+    const comentarios = pedidoData?.comentarios || '';
+    const match = comentarios.match(/Cliente: ([^-]+)/);
+    return match ? match[1].trim() : 'Cliente';
   };
 
   return (
@@ -232,12 +351,15 @@ const EstadoPedido = () => {
       </div>
 
       <div className={styles.content}>
-        {/* Tarjeta de información del pedido */}
         <div className={styles.infoPedido}>
           <div className={styles.infoCard}>
             <div className={styles.infoRow}>
               <span className={styles.label}>Número de pedido:</span>
-              <span className={styles.value}>#{pedidoActivo.id}</span>
+              <span className={styles.value}>#{pedidoData?.numeroPedido}</span>
+            </div>
+            <div className={styles.infoRow}>
+              <span className={styles.label}>Cliente:</span>
+              <span className={styles.value}>{getNombreCliente()}</span>
             </div>
             <div className={styles.infoRow}>
               <span className={styles.label}>Fecha:</span>
@@ -245,7 +367,7 @@ const EstadoPedido = () => {
             </div>
             <div className={styles.infoRow}>
               <span className={styles.label}>Total:</span>
-              <span className={styles.value}>${pedidoActivo.total.toFixed(2)} MXN</span>
+              <span className={styles.value}>${pedidoData?.total?.toFixed(2) || 0} MXN</span>
             </div>
             <div className={styles.infoRow}>
               <span className={styles.label}>Método de pago:</span>
@@ -258,22 +380,34 @@ const EstadoPedido = () => {
           </div>
         </div>
 
-        {/* Timeline del pedido */}
         <div className={styles.timelineSection}>
           <h2>Proceso de tu pedido</h2>
-          <TimelinePedido 
-            pasos={pasos} 
-            estadoActual={pedidoActivo.estado}
-          />
+          <div className={styles.timeline}>
+            {pasos.map((paso, index) => {
+              const isCompleted = index + 1 <= pasoActual;
+              const isActive = index + 1 === pasoActual;
+
+              return (
+                <div key={index} className={styles.timelineStep}>
+                  <div className={`${styles.stepCircle} ${isCompleted ? styles.completed : ''} ${isActive ? styles.active : ''}`}>
+                    <span className={styles.stepIcon}>{paso.icon}</span>
+                  </div>
+                  <div className={styles.stepLabel}>{paso.label}</div>
+                  {index < pasos.length - 1 && (
+                    <div className={`${styles.stepLine} ${isCompleted ? styles.lineCompleted : ''}`} />
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
 
-        {/* SECCIÓN DE DATOS CURIOSOS */}
         <div className={styles.curiousSection}>
           <div className={styles.curiousContainer}>
             <div className={styles.curiousHeader}>
               <span className={styles.curiousIcon}>🤔</span>
               <h2 className={styles.curiousTitle}>¿Sabías que...?</h2>
-              <button 
+              <button
                 className={styles.curiousRefresh}
                 onClick={cambiarDatoCurioso}
                 aria-label="Ver otro dato curioso"
@@ -281,11 +415,11 @@ const EstadoPedido = () => {
                 🔄
               </button>
             </div>
-            
+
             <div className={`${styles.curiosoContainer} ${animating ? styles.curiosoContainerAnimating : ''}`}>
               {imagenChef && (
                 <div className={styles.chefImageWrapper}>
-                  <img 
+                  <img
                     src={imagenChef}
                     alt="Chef preparando sushi artesanal"
                     className={styles.chefBackgroundImage}
@@ -293,12 +427,12 @@ const EstadoPedido = () => {
                   <div className={styles.chefOverlayDark}></div>
                 </div>
               )}
-              
+
               {datoCurioso && (
                 <div className={styles.datoSuperpuesto}>
                   <div className={styles.datoCard}>
-                    <div 
-                      className={styles.datoColorBar} 
+                    <div
+                      className={styles.datoColorBar}
                       style={{ backgroundColor: datoCurioso.color }}
                     ></div>
                     <div className={styles.datoContent}>
@@ -312,12 +446,12 @@ const EstadoPedido = () => {
                 </div>
               )}
             </div>
-            
+
             <div className={styles.curiousFooter}>
               <div className={styles.curiousMessage}>
                 <span>Mientras esperas, aprende más sobre sushi</span>
               </div>
-              <button 
+              <button
                 className={styles.curiousNextBtn}
                 onClick={cambiarDatoCurioso}
               >
@@ -328,25 +462,24 @@ const EstadoPedido = () => {
           </div>
         </div>
 
-        {/* Resumen del pedido */}
         <div className={styles.resumenSection}>
           <h2>Resumen de tu pedido</h2>
           <div className={styles.itemsList}>
-            {pedidoActivo.items.map((item, index) => (
+            {detalles.map((item, index) => (
               <div key={index} className={styles.item}>
                 <div className={styles.itemInfo}>
                   <span className={styles.itemCantidad}>{item.cantidad}x</span>
-                  <span className={styles.itemNombre}>{item.nombre}</span>
+                  <span className={styles.itemNombre}>{item.nombreProducto}</span>
                 </div>
                 <span className={styles.itemPrecio}>
-                  ${(item.precio * item.cantidad).toFixed(2)} MXN
+                  ${(item.precioUnitario * item.cantidad).toFixed(2)} MXN
                 </span>
               </div>
             ))}
           </div>
           <div className={styles.total}>
             <span>Total</span>
-            <span className={styles.totalMonto}>${pedidoActivo.total.toFixed(2)} MXN</span>
+            <span className={styles.totalMonto}>${pedidoData?.total?.toFixed(2) || 0} MXN</span>
           </div>
         </div>
       </div>

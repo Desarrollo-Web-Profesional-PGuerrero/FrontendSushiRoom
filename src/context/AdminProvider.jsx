@@ -27,10 +27,26 @@ export const AdminProvider = ({ children }) => {
     try {
       setLoading(true);
       const response = await fetch(`${API_URL}/productos`);
+      if (!response.ok) throw new Error('Error al cargar productos');
       const data = await response.json();
-      setProductos(data);
+
+      const productosFormateados = data.map(producto => ({
+        id: producto.id,
+        nombre: producto.nombre,
+        precio: producto.precio,
+        descripcion: producto.descripcion || '',
+        origen: producto.origen || '',
+        notasCata: producto.notasCata || '',
+        categoria: producto.categoriaNombre?.toLowerCase() || 'roll', // ← Aquí está la clave
+        categoriaId: producto.categoriaId,
+        disponible: producto.activo,
+        imagen: producto.imagenUrl || '/src/assets/images/default.jpg',
+        ingredientes: []
+      }));
+
+      setProductos(productosFormateados);
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error al cargar productos:', error);
     } finally {
       setLoading(false);
     }
@@ -41,39 +57,40 @@ export const AdminProvider = ({ children }) => {
       const response = await fetch(`${API_URL}/productos/categorias`);
       if (response.ok) {
         const data = await response.json();
+        console.log('Categorías desde backend:', data);
         setCategorias(data);
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error al cargar categorías:', error);
     }
   };
 
   const login = async (email, password) => {
-  try {
-    const response = await fetch(`${API_URL}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
-    
-    const data = await response.json();
-    
-    if (data.success) {
-      setIsAuthenticated(true);
-      localStorage.setItem('user', JSON.stringify({
-        nombre: data.nombre,
-        email: data.email,
-        rol: data.rol
-      }));
-      setUser({ nombre: data.nombre, email: data.email, rol: data.rol });
-      return true;
+    try {
+      const response = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setIsAuthenticated(true);
+        localStorage.setItem('user', JSON.stringify({
+          nombre: data.nombre,
+          email: data.email,
+          rol: data.rol
+        }));
+        setUser({ nombre: data.nombre, email: data.email, rol: data.rol });
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Error:', error);
+      return false;
     }
-    return false;
-  } catch (error) {
-    console.error('Error:', error);
-    return false;
-  }
-};
+  };
 
   const logout = () => {
     setIsAuthenticated(false);
@@ -84,33 +101,89 @@ export const AdminProvider = ({ children }) => {
 
   const agregarProducto = async (producto) => {
     try {
+      // Buscar la categoría por nombre
+      const categoriaSeleccionada = categorias.find(
+        c => c.nombre.toLowerCase() === producto.categoria.toLowerCase()
+      );
+
+      if (!categoriaSeleccionada) {
+        console.error('❌ Categoría no encontrada:', producto.categoria);
+        alert(`Categoría "${producto.categoria}" no existe en la base de datos`);
+        return;
+      }
+
+      const productoBackend = {
+        nombre: producto.nombre,
+        descripcion: producto.descripcion || '',
+        origen: producto.origen || '',
+        notasCata: producto.notasCata || '',
+        precio: parseFloat(producto.precio),
+        imagenUrl: producto.imagen,
+        activo: true,  // Siempre activo
+        categoriaId: categoriaSeleccionada.id  // ← SOLO el ID, no el nombre
+      };
+
+      console.log('Enviando al backend:', productoBackend);
+
       const response = await fetch(`${API_URL}/productos`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(producto)
+        body: JSON.stringify(productoBackend)
       });
-      if (response.ok) {
-        await cargarProductos();
-      }
+
+      if (!response.ok) throw new Error('Error al crear producto');
+
+      await cargarProductos();
+      return true;
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error al agregar producto:', error);
+      throw error;
     }
   };
 
-  const editarProducto = async (id, producto) => {
-    try {
-      const response = await fetch(`${API_URL}/productos/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(producto)
-      });
-      if (response.ok) {
-        await cargarProductos();
-      }
-    } catch (error) {
-      console.error('Error:', error);
+  const editarProducto = async (id, productoActualizado) => {
+  try {
+    const categoriaSeleccionada = categorias.find(
+      c => c.nombre.toLowerCase() === productoActualizado.categoria.toLowerCase()
+    );
+    
+    const productoBackend = {
+      nombre: productoActualizado.nombre,
+      descripcion: productoActualizado.descripcion || '',
+      origen: productoActualizado.origen || '',
+      notasCata: productoActualizado.notasCata || '',
+      precio: parseFloat(productoActualizado.precio),
+      imagenUrl: productoActualizado.imagen || '',
+      activo: true,
+      categoriaId: categoriaSeleccionada?.id || 2
+    };
+    
+    console.log('✏️ Editando producto:', { id, productoBackend });
+    
+    const response = await fetch(`${API_URL}/productos/${id}`, {
+      method: 'PUT',
+      headers: { 
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(productoBackend)
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Error response:', errorText);
+      throw new Error(`Error ${response.status}: ${errorText}`);
     }
-  };
+    
+    const data = await response.json();
+    console.log('✅ Producto actualizado:', data);
+    
+    await cargarProductos();
+    return data;
+  } catch (error) {
+    console.error('❌ Error al editar producto:', error);
+    throw error;
+  }
+};
 
   const eliminarProducto = async (id) => {
     if (window.confirm('¿Eliminar este producto?')) {
