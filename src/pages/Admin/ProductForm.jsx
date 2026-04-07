@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { crearProducto, actualizarProducto } from '../../services/productService';
+import { crearProducto, actualizarProducto } from '../../services/api';
 import styles from './ProductForm.module.css';
 
 const ProductForm = ({ producto, onGuardar, onCancelar }) => {
