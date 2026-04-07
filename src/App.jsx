@@ -20,6 +20,8 @@ import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
 import EmpleadoPanel from './pages/Admin/EmpleadoPanel';
 import ConfirmacionPedido from './pages/ConfirmacionPedido/ConfirmacionPedido';
 import Login from './pages/Login/Login';
+import NotFound from "./pages/NotFound/NotFound";
+import Breadcrumbs from "./components/Breadcrumbs/Breadcrumbs"; // ← IMPORTAR BREADCRUMBS
 import "./App.css";
 
 function App() {
@@ -30,6 +32,7 @@ function App() {
           <PedidoProvider>
             <div className="app">
               <Header />
+              <Breadcrumbs /> {/* ← AGREGAR BREADCRUMBS AQUÍ */}
               <main className="main-content">
                 <Routes>
                   <Route path="/" element={<Home />} />
@@ -40,7 +43,6 @@ function App() {
                   <Route path="/checkout" element={<Checkout />} />
                   <Route path="/confirmacion" element={<ConfirmacionPedido />} />
                   <Route path="/estado-pedido/:id" element={<EstadoPedido />} />
-                  <Route path="/checkout" element={<Checkout />} />
                   <Route path="/admin/login" element={<AdminLogin />} />
                   <Route path="/admin/panel" element={
                     <PrivateRoute rolRequerido="admin">
@@ -53,7 +55,7 @@ function App() {
                     </PrivateRoute>
                   } />
                   <Route path="/login" element={<Login />} />
-                  <Route path="*" element={<h2>404 - Página no encontrada</h2>} />
+                  <Route path="*" element={<NotFound />} />
                 </Routes>
               </main>
               <Footer />
@@ -65,4 +67,4 @@ function App() {
   );
 }
 
-export default App;   
+export default App;
