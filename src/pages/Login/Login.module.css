@@ -110,3 +110,192 @@
 .backLink:hover {
   color: #ff8a5e;
 }
+
+/* Agrega estos estilos a tu Login.module.css */
+
+.linksContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.recoverLink {
+  background: none;
+  border: none;
+  color: #8b7355;
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.recoverLink:hover {
+  color: #ff8a5e;
+}
+
+/* Modal styles */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.modalContent {
+  background: white;
+  border-radius: 24px;
+  width: 90%;
+  max-width: 450px;
+  padding: 2rem;
+  position: relative;
+  animation: modalSlideIn 0.3s ease;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #ff8a5e;
+}
+
+.modalHeader h3 {
+  font-size: 1.3rem;
+  color: #2f5d3a;
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+.modalClose {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #8b7355;
+  transition: color 0.3s ease;
+  padding: 0;
+  line-height: 1;
+}
+
+.modalClose:hover {
+  color: #ff8a5e;
+}
+
+.recoveryMessage {
+  padding: 0.75rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.successMessage {
+  background: rgba(47, 93, 58, 0.1);
+  color: #2f5d3a;
+  border: 1px solid #2f5d3a;
+}
+
+.errorMessage {
+  background: rgba(255, 138, 94, 0.1);
+  color: #ff8a5e;
+  border: 1px solid #ff8a5e;
+}
+
+.modalActions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.recoveryBtn {
+  flex: 1;
+  background: #1a1a1a;
+  color: white;
+  border: none;
+  padding: 0.7rem 1rem;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.recoveryBtn:hover:not(:disabled) {
+  background: #ff8a5e;
+  transform: translateY(-2px);
+}
+
+.recoveryBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cancelBtn {
+  flex: 1;
+  background: transparent;
+  border: 1px solid #e3dbce;
+  color: #8b7355;
+  padding: 0.7rem 1rem;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cancelBtn:hover {
+  background: #e3dbce;
+}
+
+.modalFooter {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e3dbce;
+  text-align: center;
+}
+
+.modalFooter p {
+  font-size: 0.7rem;
+  color: #8b7355;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .modalContent {
+    padding: 1.5rem;
+    width: 95%;
+  }
+  
+  .modalActions {
+    flex-direction: column;
+  }
+  
+  .linksContainer {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}

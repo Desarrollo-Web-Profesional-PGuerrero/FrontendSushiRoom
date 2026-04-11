@@ -1,0 +1,201 @@
+/* src/pages/RegistroInvitacion.module.css */
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2f5d3a 100%);
+  padding: 2rem;
+}
+
+.card {
+  background: white;
+  border-radius: 32px;
+  padding: 2.5rem;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.logo {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.logo h1 {
+  font-size: 1.8rem;
+  color: #2f5d3a;
+  margin: 0;
+}
+
+.card h2 {
+  font-size: 1.5rem;
+  color: #1a1a1a;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.infoBox {
+  background: #fdf7ec;
+  border-radius: 16px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border-left: 4px solid #ff8a5e;
+}
+
+.infoBox p {
+  margin: 0.5rem 0;
+  color: #4a4a4a;
+}
+
+.formGroup {
+  margin-bottom: 1.2rem;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #2f5d3a;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.formGroup input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 1px solid #e3dbce;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.formGroup input:focus {
+  outline: none;
+  border-color: #ff8a5e;
+  box-shadow: 0 0 0 3px rgba(255, 138, 94, 0.1);
+}
+
+.formGroup small {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.7rem;
+  color: #8b7355;
+}
+
+.error {
+  background: rgba(255, 138, 94, 0.1);
+  color: #ff8a5e;
+  padding: 0.8rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  margin: 1rem 0;
+  text-align: center;
+  border: 1px solid #ff8a5e;
+}
+
+.registerBtn {
+  width: 100%;
+  background: #1a1a1a;
+  color: white;
+  border: none;
+  padding: 1rem;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+}
+
+.registerBtn:hover:not(:disabled) {
+  background: #ff8a5e;
+  transform: translateY(-2px);
+}
+
+.registerBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.footer {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.7rem;
+  color: #8b7355;
+}
+
+.loadingSpinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid #e3dbce;
+  border-top-color: #ff8a5e;
+  border-radius: 50%;
+  margin: 0 auto 1rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.iconError {
+  font-size: 4rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.homeBtn {
+  display: inline-block;
+  background: #2f5d3a;
+  color: white;
+  text-decoration: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 50px;
+  margin-top: 1rem;
+  transition: all 0.3s ease;
+}
+
+.homeBtn:hover {
+  background: #ff8a5e;
+  transform: translateY(-2px);
+}
+
+.card ul {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+  color: #666;
+}
+
+.card ul li {
+  margin: 0.5rem 0;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .card {
+    padding: 1.5rem;
+  }
+  
+  .card h2 {
+    font-size: 1.3rem;
+  }
+}

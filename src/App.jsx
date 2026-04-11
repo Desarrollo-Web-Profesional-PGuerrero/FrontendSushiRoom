@@ -21,7 +21,8 @@ import EmpleadoPanel from './pages/Admin/EmpleadoPanel';
 import ConfirmacionPedido from './pages/ConfirmacionPedido/ConfirmacionPedido';
 import Login from './pages/Login/Login';
 import NotFound from "./pages/NotFound/NotFound";
-import Breadcrumbs from "./components/Breadcrumbs/Breadcrumbs"; // ← IMPORTAR BREADCRUMBS
+import Breadcrumbs from "./components/Breadcrumbs/Breadcrumbs";
+import Sitemap from "./pages/Sitemap/Sitemap";
 import "./App.css";
 
 function App() {
@@ -55,6 +56,7 @@ function App() {
                     </PrivateRoute>
                   } />
                   <Route path="/login" element={<Login />} />
+                  <Route path="/sitemap" element={<Sitemap />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </main>

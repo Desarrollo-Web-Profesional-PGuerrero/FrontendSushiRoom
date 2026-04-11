@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import styles from './Home.module.css';
+import React, { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import styles from "./Home.module.css";
 
 const Home = () => {
   const heroRef = useRef(null);
@@ -9,9 +9,9 @@ const Home = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [showContactModal, setShowContactModal] = useState(false); // Nuevo estado para el modal
   const [preferences, setPreferences] = useState({
-    tipo: '',
-    picante: '',
-    favorito: ''
+    tipo: "",
+    picante: "",
+    favorito: "",
   });
   const navigate = useNavigate();
 
@@ -23,67 +23,109 @@ const Home = () => {
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const questions = {
     1: {
       question: "🍣 ¿Qué tipo de sushi prefieres?",
       options: [
-        { value: "nigiri", label: "Nigiri", icon: "🍣", desc: "Arroz con pescado encima" },
+        {
+          value: "nigiri",
+          label: "Nigiri",
+          icon: "🍣",
+          desc: "Arroz con pescado encima",
+        },
         { value: "maki", label: "Maki", icon: "🌯", desc: "Rollos enrollados" },
-        { value: "sashimi", label: "Sashimi", icon: "🐟", desc: "Solo pescado fresco" },
-        { value: "todos", label: "Todos", icon: "🎌", desc: "Me gusta variar" }
-      ]
+        {
+          value: "sashimi",
+          label: "Sashimi",
+          icon: "🐟",
+          desc: "Solo pescado fresco",
+        },
+        { value: "todos", label: "Todos", icon: "🎌", desc: "Me gusta variar" },
+      ],
     },
     2: {
       question: "🌶️ ¿Qué tan picante te gusta?",
       options: [
         { value: "suave", label: "Suave", icon: "😊", desc: "Sin picante" },
-        { value: "medio", label: "Medio", icon: "😋", desc: "Un toque picante" },
-        { value: "fuerte", label: "Fuerte", icon: "🔥", desc: "Me encanta el picante" }
-      ]
+        {
+          value: "medio",
+          label: "Medio",
+          icon: "😋",
+          desc: "Un toque picante",
+        },
+        {
+          value: "fuerte",
+          label: "Fuerte",
+          icon: "🔥",
+          desc: "Me encanta el picante",
+        },
+      ],
     },
     3: {
       question: "🐟 ¿Cuál es tu proteína favorita?",
       options: [
-        { value: "salmón", label: "Salmón", icon: "🐟", desc: "Clásico y suave" },
-        { value: "atun", label: "Atún", icon: "🎣", desc: "Intenso y delicioso" },
-        { value: "camaron", label: "Camarón", icon: "🦐", desc: "Crujiente y suave" },
-        { value: "vegetariano", label: "Vegetariano", icon: "🥑", desc: "Opción sin pescado" }
-      ]
-    }
+        {
+          value: "salmón",
+          label: "Salmón",
+          icon: "🐟",
+          desc: "Clásico y suave",
+        },
+        {
+          value: "atun",
+          label: "Atún",
+          icon: "🎣",
+          desc: "Intenso y delicioso",
+        },
+        {
+          value: "camaron",
+          label: "Camarón",
+          icon: "🦐",
+          desc: "Crujiente y suave",
+        },
+        {
+          value: "vegetariano",
+          label: "Vegetariano",
+          icon: "🥑",
+          desc: "Opción sin pescado",
+        },
+      ],
+    },
   };
 
   const handleExperienceSelect = (experience) => {
-    localStorage.setItem('userExperience', experience);
+    localStorage.setItem("userExperience", experience);
 
-    if (experience === 'guided') {
+    if (experience === "guided") {
       setShowSelector(false);
       setShowQuestions(true);
     } else {
-      navigate('/menu');
+      navigate("/menu");
     }
   };
 
   const handlePreferenceSelect = (step, value) => {
-    const field = step === 1 ? 'tipo' : step === 2 ? 'picante' : 'favorito';
+    const field = step === 1 ? "tipo" : step === 2 ? "picante" : "favorito";
     const newPreferences = { ...preferences, [field]: value };
     setPreferences(newPreferences);
 
     if (step < 3) {
       setCurrentStep(step + 1);
     } else {
-      localStorage.setItem('userPreferences', JSON.stringify(newPreferences));
-      navigate('/menu', { state: { recommendations: true, preferences: newPreferences } });
+      localStorage.setItem("userPreferences", JSON.stringify(newPreferences));
+      navigate("/menu", {
+        state: { recommendations: true, preferences: newPreferences },
+      });
     }
   };
 
   const handleStartJourney = () => {
-    const hasExperience = localStorage.getItem('userExperience');
+    const hasExperience = localStorage.getItem("userExperience");
     if (hasExperience) {
-      navigate('/menu');
+      navigate("/menu");
     } else {
       setShowSelector(true);
     }
@@ -106,7 +148,7 @@ const Home = () => {
           <div className={styles.selectorOptions}>
             <button
               className={`${styles.selectorBtn} ${styles.guidedBtn}`}
-              onClick={() => handleExperienceSelect('guided')}
+              onClick={() => handleExperienceSelect("guided")}
             >
               <span className={styles.selectorIcon}>⚙</span>
               <div>
@@ -117,7 +159,7 @@ const Home = () => {
 
             <button
               className={`${styles.selectorBtn} ${styles.directBtn}`}
-              onClick={() => handleExperienceSelect('direct')}
+              onClick={() => handleExperienceSelect("direct")}
             >
               <span className={styles.selectorIcon}>🗒</span>
               <div>
@@ -158,7 +200,9 @@ const Home = () => {
               <button
                 key={option.value}
                 className={styles.optionCard}
-                onClick={() => handlePreferenceSelect(currentStep, option.value)}
+                onClick={() =>
+                  handlePreferenceSelect(currentStep, option.value)
+                }
               >
                 <span className={styles.optionIcon}>{option.icon}</span>
                 <div>
@@ -171,7 +215,7 @@ const Home = () => {
 
           <button
             className={styles.skipQuestions}
-            onClick={() => navigate('/menu')}
+            onClick={() => navigate("/menu")}
           >
             Saltar y ver menú completo →
           </button>
@@ -192,8 +236,13 @@ const Home = () => {
       {/* Modal de Contacto */}
       {showContactModal && (
         <div className={styles.modalOverlay} onClick={closeModal}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <button className={styles.modalClose} onClick={closeModal}>×</button>
+          <div
+            className={styles.modalContent}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button className={styles.modalClose} onClick={closeModal}>
+              ×
+            </button>
             <div className={styles.modalIcon}>🗨</div>
             <h2 className={styles.modalTitle}>Contáctanos</h2>
             <p className={styles.modalSubtitle}>Estamos aquí para ayudarte</p>
@@ -202,33 +251,59 @@ const Home = () => {
               <div className={styles.contactItem}>
                 <span className={styles.contactIcon}>✆</span>
                 <div className={styles.contactDetails}>
-                  <span className={styles.contactLabel}>Teléfono / WhatsApp</span>
-                  <a href="tel:+521234567890" className={styles.contactValue}>+52 (123) 456-7890</a>
-                  <span className={styles.contactHint}>Llámanos o escribe por WhatsApp</span>
+                  <span className={styles.contactLabel}>
+                    Teléfono / WhatsApp
+                  </span>
+                  <a href="tel:+521234567890" className={styles.contactValue}>
+                    +52 (123) 456-7890
+                  </a>
+                  <span className={styles.contactHint}>
+                    Llámanos o escribe por WhatsApp
+                  </span>
                 </div>
               </div>
 
               <div className={styles.contactItem}>
                 <span className={styles.contactIcon}>✉︎</span>
                 <div className={styles.contactDetails}>
-                  <span className={styles.contactLabel}>Correo Electrónico</span>
-                  <a href="mailto:info@sushisroom.com" className={styles.contactValue}>info@sushisroom.com</a>
-                  <span className={styles.contactHint}>Respuesta en menos de 24h</span>
+                  <span className={styles.contactLabel}>
+                    Correo Electrónico
+                  </span>
+                  <a
+                    href="mailto:info@sushisroom.com"
+                    className={styles.contactValue}
+                  >
+                    info@sushisroom.com
+                  </a>
+                  <span className={styles.contactHint}>
+                    Respuesta en menos de 24h
+                  </span>
                 </div>
               </div>
 
               <div className={styles.contactItem}>
                 <span className={styles.contactIcon}>⏱</span>
                 <div className={styles.contactDetails}>
-                  <span className={styles.contactLabel}>Horario de Atención</span>
-                  <span className={styles.contactValue}>Lunes a Domingo: 12:00 - 22:00</span>
-                  <span className={styles.contactHint}>Servicio a domicilio hasta las 21:30</span>
+                  <span className={styles.contactLabel}>
+                    Horario de Atención
+                  </span>
+                  <span className={styles.contactValue}>
+                    Lunes a Domingo: 12:00 - 22:00
+                  </span>
+                  <span className={styles.contactHint}>
+                    Servicio a domicilio hasta las 21:30
+                  </span>
                 </div>
               </div>
             </div>
 
             <div className={styles.modalActions}>
-              <a href="https://wa.me/521234567890" target="_blank" rel="noopener noreferrer" className={styles.modalBtnWhatsapp}>
+              <a
+                href="https://wa.me/521234567890"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.modalBtnWhatsapp}
+              >
                 💬 WhatsApp
               </a>
             </div>
@@ -254,18 +329,24 @@ const Home = () => {
 
             <div className={styles.subtitleWrapper}>
               <p className={styles.subtitleJp}>心を込めて</p>
-              <p className={styles.subtitleEn}>"Preparado con el corazón y dedicación"</p>
+              <p className={styles.subtitleEn}>
+                "Preparado con el corazón y dedicación"
+              </p>
             </div>
-            
+
             <button onClick={handleStartJourney} className={styles.btn}>
               <span className={styles.btnText}>Comenzar viaje</span>
               <span className={styles.btnIcon}>➔</span>
             </button>
 
-            <div className={styles.scrollIndicator}>
+            <button
+              className={styles.scrollIndicator}
+              onClick={() => navigate("/menu")}
+              aria-label="Descubre más sobre nuestro menú"
+            >
               <span className={styles.scrollText}>Descubre más</span>
               <div className={styles.scrollArrow}>↓</div>
-            </div>
+            </button>
           </div>
         </div>
       </div>
@@ -274,13 +355,18 @@ const Home = () => {
       <div className={styles.servicesSection}>
         <div className={styles.container}>
           <h2 className={styles.sectionTitle}>Nuestros Servicios</h2>
-          <p className={styles.sectionSubtitle}>Ofrecemos una experiencia completa para los amantes del sushi</p>
+          <p className={styles.sectionSubtitle}>
+            Ofrecemos una experiencia completa para los amantes del sushi
+          </p>
 
           <div className={styles.servicesGrid}>
             <div className={styles.serviceCard}>
               <div className={styles.serviceIcon}>🍣</div>
               <h3>Sushi a Domicilio</h3>
-              <p>Disfruta de nuestro sushi en la comodidad de tu hogar con entrega rápida y segura</p>
+              <p>
+                Disfruta de nuestro sushi en la comodidad de tu hogar con
+                entrega rápida y segura
+              </p>
               <ul className={styles.serviceList}>
                 <li>✓ Entrega en menos de 45 min</li>
                 <li>✓ Empaque especializado</li>
@@ -316,20 +402,29 @@ const Home = () => {
       {/* Sección Por qué elegirnos */}
       <div className={styles.whyUsSection}>
         <div className={styles.container}>
-          <h2 className={styles.sectionTitle}>¿Por qué elegir The Sushi Room?</h2>
-          <p className={styles.sectionSubtitle}>Calidad, tradición y pasión en cada platillo</p>
+          <h2 className={styles.sectionTitle}>
+            ¿Por qué elegir The Sushi Room?
+          </h2>
+          <p className={styles.sectionSubtitle}>
+            Calidad, tradición y pasión en cada platillo
+          </p>
 
           <div className={styles.whyUsGrid}>
             <div className={styles.whyUsItem}>
               <div className={styles.whyUsIcon}>🐟</div>
               <h3>Pescado Fresco</h3>
-              <p>Producto fresco diariamente, seleccionado de las mejores pescaderías</p>
+              <p>
+                Producto fresco diariamente, seleccionado de las mejores
+                pescaderías
+              </p>
             </div>
 
             <div className={styles.whyUsItem}>
               <div className={styles.whyUsIcon}>👨‍🍳</div>
               <h3>Chefs Expertos</h3>
-              <p>Más de 10 años de experiencia en cocina japonesa tradicional</p>
+              <p>
+                Más de 10 años de experiencia en cocina japonesa tradicional
+              </p>
             </div>
 
             <div className={styles.whyUsItem}>
@@ -350,13 +445,20 @@ const Home = () => {
       {/* Sección Testimonios */}
       <div className={styles.testimonialsSection}>
         <div className={styles.container}>
-          <h2 className={styles.sectionTitle}>Lo que dicen nuestros clientes</h2>
-          <p className={styles.sectionSubtitle}>Experiencias reales de nuestros comensales</p>
+          <h2 className={styles.sectionTitle}>
+            Lo que dicen nuestros clientes
+          </h2>
+          <p className={styles.sectionSubtitle}>
+            Experiencias reales de nuestros comensales
+          </p>
 
           <div className={styles.testimonialsGrid}>
             <div className={styles.testimonialCard}>
               <div className={styles.testimonialStars}>★★★★★</div>
-              <p className={styles.testimonialText}>"El mejor sushi que he probado en la ciudad. Ingredientes frescos y un servicio excepcional. ¡Volveré sin duda!"</p>
+              <p className={styles.testimonialText}>
+                "El mejor sushi que he probado en la ciudad. Ingredientes
+                frescos y un servicio excepcional. ¡Volveré sin duda!"
+              </p>
               <div className={styles.testimonialAuthor}>
                 <span className={styles.authorName}>María González</span>
                 <span className={styles.authorDate}>Cliente frecuente</span>
@@ -365,7 +467,11 @@ const Home = () => {
 
             <div className={styles.testimonialCard}>
               <div className={styles.testimonialStars}>★★★★★</div>
-              <p className={styles.testimonialText}>"La experiencia guiada fue increíble. Me recomendaron platos según mis gustos y descubrí nuevos sabores que ahora son mis favoritos."</p>
+              <p className={styles.testimonialText}>
+                "La experiencia guiada fue increíble. Me recomendaron platos
+                según mis gustos y descubrí nuevos sabores que ahora son mis
+                favoritos."
+              </p>
               <div className={styles.testimonialAuthor}>
                 <span className={styles.authorName}>Carlos Rodríguez</span>
                 <span className={styles.authorDate}>Primera vez</span>
@@ -374,7 +480,10 @@ const Home = () => {
 
             <div className={styles.testimonialCard}>
               <div className={styles.testimonialStars}>★★★★★</div>
-              <p className={styles.testimonialText}>"Contratamos el servicio de catering para nuestra boda y fue todo un éxito. Todos nuestros invitados quedaron encantados."</p>
+              <p className={styles.testimonialText}>
+                "Contratamos el servicio de catering para nuestra boda y fue
+                todo un éxito. Todos nuestros invitados quedaron encantados."
+              </p>
               <div className={styles.testimonialAuthor}>
                 <span className={styles.authorName}>Ana y Luis</span>
                 <span className={styles.authorDate}>Evento especial</span>
@@ -390,10 +499,16 @@ const Home = () => {
           <h2>¿Listo para una experiencia única?</h2>
           <p>Reserva tu mesa o haz tu pedido a domicilio</p>
           <div className={styles.ctaButtons}>
-            <button onClick={() => navigate('/menu')} className={styles.ctaPrimary}>
+            <button
+              onClick={() => navigate("/menu")}
+              className={styles.ctaPrimary}
+            >
               Ver Menú
             </button>
-            <button onClick={handleContactClick} className={styles.ctaSecondary}>
+            <button
+              onClick={handleContactClick}
+              className={styles.ctaSecondary}
+            >
               Contacto
             </button>
           </div>
@@ -405,8 +520,8 @@ const Home = () => {
         <button
           className={styles.resetExperienceBtn}
           onClick={() => {
-            localStorage.removeItem('userExperience');
-            localStorage.removeItem('userPreferences');
+            localStorage.removeItem("userExperience");
+            localStorage.removeItem("userPreferences");
             window.location.reload();
           }}
         >

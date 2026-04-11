@@ -17,62 +17,33 @@ const Menu = () => {
   const { agregarAlCarrito, notification } = useCarrito();
   const location = useLocation();
 
-  // ... (mantén todas las funciones existentes: filtrarProductosPorPreferencias, cargarProductos, etc.)
-  // Las funciones se mantienen igual, solo cambiamos los estilos
+  // Función central para aplicar recomendaciones
+  const aplicarRecomendaciones = (prefs) => {
+    const productosRecomendados = filtrarProductosPorPreferencias(productos, prefs);
+    setProductosFiltrados(productosRecomendados);
+    setActiveFilter("recomendados");
 
-  useEffect(() => {
-    cargarProductos();
-  }, []);
+    // Generar mensaje personalizado
+    let message = "";
+    if (prefs.tipo === "nigiri") message = "🍣 Te recomendamos empezar con nuestros Nigiris";
+    else if (prefs.tipo === "maki") message = "🌯 Prueba nuestros Makis especiales";
+    else if (prefs.tipo === "sashimi") message = "🐟 Los Sashimi son una excelente elección";
+    else if (prefs.tipo === "todos") message = "🎌 Explora nuestra selección variada";
 
-  useEffect(() => {
-    if (location.state?.recommendations && productos.length > 0) {
-      const prefs = location.state.preferences;
-      let message = "";
+    if (prefs.picante === "fuerte") message += " 🔥 con un toque extra picante";
+    else if (prefs.picante === "medio") message += " 🌶️ con un ligero toque picante";
 
-      const productosRecomendados = filtrarProductosPorPreferencias(
-        productos,
-        prefs
-      );
-      setProductosFiltrados(productosRecomendados);
-      setActiveFilter("recomendados");
+    if (prefs.favorito === "salmón") message += " 🐟 especialmente de Salmón";
+    else if (prefs.favorito === "atun") message += " 🎣 especialmente de Atún";
+    else if (prefs.favorito === "camaron") message += " 🦐 especialmente de Camarón";
+    else if (prefs.favorito === "vegetariano") message += " 🥑 especialmente nuestra opción vegetariana";
 
-      if (prefs.tipo === "nigiri") {
-        message = "🍣 Te recomendamos empezar con nuestros Nigiris";
-      } else if (prefs.tipo === "maki") {
-        message = "🌯 Prueba nuestros Makis especiales";
-      } else if (prefs.tipo === "sashimi") {
-        message = "🐟 Los Sashimi son una excelente elección";
-      } else if (prefs.tipo === "todos") {
-        message = "🎌 Explora nuestra selección variada";
-      }
+    setRecommendationMessage(message);
+    setShowRecommendation(true);
+    setTimeout(() => setShowRecommendation(false), 5000);
+  };
 
-      if (prefs.picante === "fuerte") {
-        message += " 🔥 con un toque extra picante";
-      } else if (prefs.picante === "medio") {
-        message += " 🌶️ con un ligero toque picante";
-      }
-
-      if (prefs.favorito === "salmón") {
-        message += " 🐟 especialmente de Salmón";
-      } else if (prefs.favorito === "atun") {
-        message += " 🎣 especialmente de Atún";
-      } else if (prefs.favorito === "camaron") {
-        message += " 🦐 especialmente de Camarón";
-      } else if (prefs.favorito === "vegetariano") {
-        message += " 🥑 especialmente nuestra opción vegetariana";
-      }
-
-      setRecommendationMessage(message);
-      setShowRecommendation(true);
-
-      setTimeout(() => {
-        setShowRecommendation(false);
-      }, 5000);
-    } else if (productos.length > 0) {
-      setProductosFiltrados(productos);
-    }
-  }, [location, productos]);
-
+  // Filtrar productos según preferencias
   const filtrarProductosPorPreferencias = (productos, preferencias) => {
     let filtrados = [...productos];
 
@@ -125,7 +96,6 @@ const Menu = () => {
     if (filtrados.length === 0) {
       return productos;
     }
-
     return filtrados;
   };
 
@@ -143,10 +113,9 @@ const Menu = () => {
         origen: producto.origen,
         notasCata: producto.notasCata,
         categoria: producto.categoria || null,
-        disponible: producto.activo, // Campo para saber si está disponible
+        disponible: producto.activo,
       }));
 
-      // 🔥 SOLO mostrar productos disponibles
       const productosDisponibles = productosFormateados.filter(
         (producto) => producto.disponible === true
       );
@@ -162,6 +131,34 @@ const Menu = () => {
     }
   };
 
+  useEffect(() => {
+    cargarProductos();
+  }, []);
+
+  // useEffect para manejar recomendaciones automáticas al cargar o cambiar productos
+  useEffect(() => {
+    if (productos.length === 0) return;
+
+    // Caso 1: Viene de la experiencia guiada (state con recommendations)
+    if (location.state?.recommendations && location.state.preferences) {
+      aplicarRecomendaciones(location.state.preferences);
+    } 
+    // Caso 2: No viene de experiencia, pero hay preferencias guardadas en localStorage
+    else {
+      const storedPrefs = localStorage.getItem('userPreferences');
+      if (storedPrefs) {
+        const prefs = JSON.parse(storedPrefs);
+        // Si ya estamos en filtro "recomendados" o queremos aplicarlo automáticamente
+        // Aquí lo aplicamos automáticamente para mejor UX
+        aplicarRecomendaciones(prefs);
+      } else {
+        // Sin preferencias: mostrar todos los productos
+        setProductosFiltrados(productos);
+        setActiveFilter("todos");
+      }
+    }
+  }, [productos, location.state]);
+
   const handleAddToCart = (producto) => {
     setAddingProduct(producto.id);
     setTimeout(() => setAddingProduct(null), 500);
@@ -176,15 +173,11 @@ const Menu = () => {
   const mostrarRecomendados = () => {
     const prefs = JSON.parse(localStorage.getItem("userPreferences") || "{}");
     if (prefs && Object.keys(prefs).length > 0) {
-      const recomendados = filtrarProductosPorPreferencias(productos, prefs);
-      setProductosFiltrados(recomendados);
-      setActiveFilter("recomendados");
+      aplicarRecomendaciones(prefs);
     } else {
       setRecommendationMessage("ⓘ Completa la experiencia guiada para obtener recomendaciones personalizadas");
       setShowRecommendation(true);
-      setTimeout(() => {
-        setShowRecommendation(false);
-      }, 3000);
+      setTimeout(() => setShowRecommendation(false), 3000);
     }
   };
 
@@ -220,15 +213,13 @@ const Menu = () => {
 
   return (
     <div className={styles.menu}>
-      {/* Banner de recomendaciones */}
       {showRecommendation && (
         <div className={styles.recommendationBanner}>
-          <span className={styles.recommendationIcon}></span>
+          <span className={styles.recommendationIcon}>🍣</span>
           <span>{recommendationMessage}</span>
         </div>
       )}
 
-      {/* Header del Menú */}
       <div className={styles.menuHeader}>
         <h1 className={styles.menuTitle}>
           {activeFilter === "recomendados" ? "Recomendados para ti" : "Nuestro Menú"}
@@ -240,27 +231,23 @@ const Menu = () => {
         </p>
       </div>
 
-      {/* Filtros */}
       <div className={styles.filtersContainer}>
         <button
-          className={`${styles.filterBtn} ${activeFilter === "todos" ? styles.filterActive : ""
-            }`}
+          className={`${styles.filterBtn} ${activeFilter === "todos" ? styles.filterActive : ""}`}
           onClick={mostrarTodosLosProductos}
         >
-          <span className={styles.filterIcon}></span>
+          <span className={styles.filterIcon}>🍱</span>
           <span>Todos los productos</span>
         </button>
         <button
-          className={`${styles.filterBtn} ${activeFilter === "recomendados" ? styles.filterActive : ""
-            }`}
+          className={`${styles.filterBtn} ${activeFilter === "recomendados" ? styles.filterActive : ""}`}
           onClick={mostrarRecomendados}
         >
-          <span className={styles.filterIcon}></span>
+          <span className={styles.filterIcon}>⭐</span>
           <span>Recomendados para ti</span>
         </button>
       </div>
 
-      {/* Notificación de carrito */}
       {notification?.show && (
         <div className={styles.notification}>
           <span className={styles.notificationIcon}>✓</span>
@@ -268,7 +255,6 @@ const Menu = () => {
         </div>
       )}
 
-      {/* No results */}
       {productosFiltrados.length === 0 && (
         <div className={styles.noResults}>
           <div className={styles.noResultsIcon}>🍣</div>
@@ -279,7 +265,6 @@ const Menu = () => {
         </div>
       )}
 
-      {/* Grid de productos */}
       <div className={styles.grid}>
         {productosFiltrados.map((producto) => (
           <div key={producto.id} className={styles.card}>
@@ -288,7 +273,7 @@ const Menu = () => {
                 <img
                   src={producto.imagen}
                   alt={producto.nombre}
-                  loading="lazy"  // ← Agrega esta línea
+                  loading="lazy"
                   onError={(e) => {
                     e.target.src = "/images/default.jpg";
                   }}
@@ -303,8 +288,7 @@ const Menu = () => {
               </div>
             </Link>
             <button
-              className={`${styles.btnAgregar} ${addingProduct === producto.id ? styles.btnAgregando : ""
-                }`}
+              className={`${styles.btnAgregar} ${addingProduct === producto.id ? styles.btnAgregando : ""}`}
               onClick={() => handleAddToCart(producto)}
             >
               {addingProduct === producto.id ? (
