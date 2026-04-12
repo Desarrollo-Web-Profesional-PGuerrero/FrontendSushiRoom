@@ -24,17 +24,6 @@ const Checkout = () => {
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
 
-  // Función para generar número de pedido con formato PED-YYYYMMDD-XXXX
-  const generarNumeroPedido = () => {
-    const ahora = new Date();
-    const año = ahora.getFullYear();
-    const mes = String(ahora.getMonth() + 1).padStart(2, '0');
-    const dia = String(ahora.getDate()).padStart(2, '0');
-    const fecha = `${año}${mes}${dia}`;
-    const aleatorio = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-    return `PED-${fecha}-${aleatorio}`;
-  };
-
   // Cargar la propina del localStorage al montar el componente
   useEffect(() => {
     const savedPropina = localStorage.getItem("propina");
@@ -272,20 +261,46 @@ const Checkout = () => {
     setIsSubmitting(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      localStorage.setItem("userName", formData.nombre.split(" ")[0]);
-
       const propinaMonto = propina > 0 
         ? (totalPrecio * propina) / 100 
         : (propinaPersonalizada && parseFloat(propinaPersonalizada) > 0 ? parseFloat(propinaPersonalizada) : 0);
 
-      // Generar número de pedido con el formato correcto
-      const numeroPedido = generarNumeroPedido();
+      // ========== ENVIAR AL BACKEND ==========
+      const itemsParaBackend = carrito.map(item => ({
+        productoId: item.id,
+        nombreProducto: item.nombre,
+        cantidad: item.cantidad,
+        precio: item.precio
+      }));
 
+      const datosPedido = {
+        metodoPago: formData.metodoPago === "efectivo" ? "Efectivo" : 
+                    formData.metodoPago === "tarjeta" ? "Tarjeta" : "Transferencia",
+        comentarios: `Cliente: ${formData.nombre} - Tel: ${formData.telefono} - Dirección: ${formData.direccion}`,
+        items: itemsParaBackend
+      };
+
+      console.log("📤 Enviando pedido al backend:", datosPedido);
+
+      const response = await fetch('http://localhost:8080/api/pedidos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(datosPedido)
+      });
+
+      const data = await response.json();
+      console.log("📥 Respuesta del backend:", data);
+
+      if (!response.ok) {
+        throw new Error(data.message || "Error al crear el pedido");
+      }
+
+      // Guardar también en localStorage para compatibilidad
       const nuevoPedido = {
-        numeroPedido: numeroPedido,
-        id: Date.now(),
+        numeroPedido: data.pedido?.numeroPedido || `PED-${Date.now()}`,
+        id: data.pedido?.id || Date.now(),
         fecha: new Date().toISOString(),
         items: carrito.map((item) => ({
           id: item.id,
@@ -313,21 +328,26 @@ const Checkout = () => {
 
       console.log("📦 Pedido creado:", nuevoPedido);
 
+      // Guardar en localStorage
       const pedidosGuardados = localStorage.getItem("pedidos");
       let pedidos = pedidosGuardados ? JSON.parse(pedidosGuardados) : [];
       pedidos.push(nuevoPedido);
       localStorage.setItem("pedidos", JSON.stringify(pedidos));
 
+      // Limpiar datos temporales
       localStorage.removeItem("propina");
       localStorage.removeItem("propinaPersonalizada");
+      localStorage.setItem("userName", formData.nombre.split(" ")[0]);
 
       vaciarCarrito();
       setIsSubmitting(false);
 
+      // Redirigir a confirmación con el número de pedido del backend
       navigate("/confirmacion", {
         state: {
           pedido: {
-            id: numeroPedido,
+            numeroPedido: data.pedido?.numeroPedido || nuevoPedido.numeroPedido,
+            id: data.pedido?.id || nuevoPedido.id,
             tiempoEstimado: nuevoPedido.tiempoEstimado,
             total: nuevoPedido.total,
             productos: nuevoPedido.productos,
@@ -335,8 +355,8 @@ const Checkout = () => {
         },
       });
     } catch (err) {
-      console.error("Error al procesar el pedido:", err);
-      setError("Ocurrió un error al procesar tu pedido. Por favor, intenta de nuevo.");
+      console.error("❌ Error al procesar el pedido:", err);
+      setError(err.message || "Ocurrió un error al procesar tu pedido. Por favor, intenta de nuevo.");
       setIsSubmitting(false);
     }
   };

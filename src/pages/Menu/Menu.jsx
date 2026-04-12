@@ -44,19 +44,25 @@ const Menu = () => {
   };
 
   // Filtrar productos según preferencias
+  // En Menu.jsx - Función corregida
   const filtrarProductosPorPreferencias = (productos, preferencias) => {
     let filtrados = [...productos];
+
+    console.log('Productos disponibles:', productos);
+    console.log('Preferencias:', preferencias);
 
     if (preferencias.tipo && preferencias.tipo !== "todos") {
       filtrados = filtrados.filter((producto) => {
         const nombreLower = producto.nombre.toLowerCase();
+        const categoriaLower = producto.categoria?.toLowerCase() || '';
+
         switch (preferencias.tipo) {
           case "nigiri":
-            return nombreLower.includes("nigiri");
+            return nombreLower.includes("nigiri") || categoriaLower.includes("nigiri");
           case "maki":
-            return nombreLower.includes("maki") || nombreLower.includes("roll");
+            return nombreLower.includes("maki") || nombreLower.includes("roll") || categoriaLower.includes("roll");
           case "sashimi":
-            return nombreLower.includes("sashimi");
+            return nombreLower.includes("sashimi") || categoriaLower.includes("sashimi");
           default:
             return true;
         }
@@ -92,6 +98,8 @@ const Menu = () => {
         });
       }
     }
+
+    console.log('Productos filtrados:', filtrados);
 
     if (filtrados.length === 0) {
       return productos;
@@ -142,7 +150,7 @@ const Menu = () => {
     // Caso 1: Viene de la experiencia guiada (state con recommendations)
     if (location.state?.recommendations && location.state.preferences) {
       aplicarRecomendaciones(location.state.preferences);
-    } 
+    }
     // Caso 2: No viene de experiencia, pero hay preferencias guardadas en localStorage
     else {
       const storedPrefs = localStorage.getItem('userPreferences');
