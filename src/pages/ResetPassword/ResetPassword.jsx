@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import styles from './ResetPassword.module.css';
+import { API_URL } from '../../services/api';
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -38,7 +39,8 @@ const ResetPassword = () => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:8080/api/auth/reset-password', {
+      // ✅ CORREGIDO: usar backticks ` ` en lugar de comillas simples ' '
+      const response = await fetch(`${API_URL}/auth/reset-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

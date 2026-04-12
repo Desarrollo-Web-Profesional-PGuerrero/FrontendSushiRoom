@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { API_URL } from '../../services/api';
 import styles from './RegistroInvitacion.module.css';
 
 const RegistroInvitacion = () => {
@@ -27,7 +28,8 @@ const RegistroInvitacion = () => {
   
   const validarToken = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/api/invitaciones/validar/${token}`);
+      // ✅ Corregido: usar API_URL
+      const response = await fetch(`${API_URL}/invitaciones/validar/${token}`);
       const data = await response.json();
       
       if (data.valido) {
@@ -66,7 +68,8 @@ const RegistroInvitacion = () => {
     setLoading(true);
     
     try {
-      const response = await fetch('http://localhost:8080/api/invitaciones/registro', {
+      // ✅ Corregido: usar API_URL
+      const response = await fetch(`${API_URL}/invitaciones/registro`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, nombre, password })
@@ -75,7 +78,6 @@ const RegistroInvitacion = () => {
       const data = await response.json();
       
       if (data.success) {
-        // Redirigir al login con mensaje de éxito
         navigate('/login?registro=exitoso&rol=' + data.rol);
       } else {
         setError(data.message || 'Error al completar el registro');

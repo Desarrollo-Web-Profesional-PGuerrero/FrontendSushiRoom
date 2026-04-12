@@ -1,6 +1,7 @@
 // src/pages/TwoFactorVerify/TwoFactorVerify.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { API_URL } from '../../services/api';
 import styles from './TwoFactorVerify.module.css';
 
 const TwoFactorVerify = () => {
@@ -41,7 +42,8 @@ const TwoFactorVerify = () => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:8080/api/auth/verify-2fa', {
+      // ✅ Corregido: usar API_URL
+      const response = await fetch(`${API_URL}/auth/verify-2fa`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, code }),
@@ -80,7 +82,8 @@ const TwoFactorVerify = () => {
   const handleResendCode = async () => {
     setCountdown(60);
     try {
-      const response = await fetch('http://localhost:8080/api/auth/resend-2fa', {
+      // ✅ Corregido: usar API_URL
+      const response = await fetch(`${API_URL}/auth/resend-2fa`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
