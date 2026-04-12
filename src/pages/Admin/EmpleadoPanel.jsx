@@ -4,20 +4,18 @@ import { useAdmin } from '../../hooks/useAdmin';
 import useSessionTimeout from "../../hooks/useSessionTimeout";
 import SessionWarning from "../../components/SessionWarning/SessionWarning";
 import styles from './EmpleadoPanel.module.css';
+import { API_URL } from '../../services/api';
 
 const EmpleadoPanel = () => {
   const { logout, user } = useAdmin();
   const navigate = useNavigate();
   
-  // ✅ Cambiado a 10 minuto
   useSessionTimeout(10);
   
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [filtroEstado, setFiltroEstado] = useState('todos');
-  
-  // ✅ Agregar key para reiniciar SessionWarning
   const [warningKey, setWarningKey] = useState(0);
 
   const handleLogout = () => {
@@ -29,13 +27,11 @@ const EmpleadoPanel = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
   
-  // ✅ Función para extender sesión
   const handleExtendSession = () => {
     setWarningKey(prev => prev + 1);
     window.dispatchEvent(new Event('mousemove'));
   };
 
-  // Estados de pedidos
   const estados = {
     pendiente: { label: 'Pendiente', color: '#ff9800', icon: '⏳' },
     preparacion: { label: 'En preparación', color: '#2196f3', icon: '👨‍🍳' },
@@ -43,62 +39,47 @@ const EmpleadoPanel = () => {
     entregado: { label: 'Entregado', color: '#9e9e9e', icon: '📦' }
   };
 
-  // Cargar pedidos (simulado - después conectas con tu backend)
   useEffect(() => {
     cargarPedidos();
   }, []);
 
+  // ✅ CORREGIDO: Usar API_URL en lugar de datos simulados
   const cargarPedidos = async () => {
     setLoading(true);
-    setTimeout(() => {
-      const pedidosEjemplo = [
-        {
-          id: 1,
-          numero: 'PED-001',
-          cliente: 'Juan Pérez',
-          estado: 'pendiente',
-          total: 335,
-          items: [
-            { nombre: 'Salmón Nigiri', cantidad: 2, precio: 105 },
-            { nombre: 'California Roll', cantidad: 1, precio: 125 }
-          ],
-          fecha: '2024-01-15 14:30'
-        },
-        {
-          id: 2,
-          numero: 'PED-002',
-          cliente: 'María García',
-          estado: 'preparacion',
-          total: 520,
-          items: [
-            { nombre: 'Sashimi Variado', cantidad: 1, precio: 220 },
-            { nombre: 'Rainbow Roll', cantidad: 2, precio: 150 }
-          ],
-          fecha: '2024-01-15 14:45'
-        },
-        {
-          id: 3,
-          numero: 'PED-003',
-          cliente: 'Carlos López',
-          estado: 'listo',
-          total: 185,
-          items: [
-            { nombre: 'Rainbow Roll', cantidad: 1, precio: 185 }
-          ],
-          fecha: '2024-01-15 15:00'
-        }
-      ];
-      setPedidos(pedidosEjemplo);
+    try {
+      const response = await fetch(`${API_URL}/pedidos`);
+      if (response.ok) {
+        const data = await response.json();
+        setPedidos(data);
+      } else {
+        console.error('Error al cargar pedidos:', response.status);
+      }
+    } catch (error) {
+      console.error('Error al cargar pedidos:', error);
+    } finally {
       setLoading(false);
-    }, 500);
+    }
   };
 
+  // ✅ CORREGIDO: Usar API_URL para cambiar estado
   const cambiarEstado = async (pedidoId, nuevoEstado) => {
-    console.log(`Cambiando pedido ${pedidoId} a ${nuevoEstado}`);
-    
-    setPedidos(pedidos.map(pedido => 
-      pedido.id === pedidoId ? { ...pedido, estado: nuevoEstado } : pedido
-    ));
+    try {
+      const response = await fetch(`${API_URL}/pedidos/${pedidoId}/estado`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ estado: nuevoEstado })
+      });
+      
+      if (response.ok) {
+        cargarPedidos();
+        alert(`Pedido actualizado a ${estados[nuevoEstado]?.label || nuevoEstado}`);
+      } else {
+        console.error('Error al cambiar estado:', response.status);
+      }
+    } catch (error) {
+      console.error('Error al cambiar estado:', error);
+      alert('Error al cambiar el estado del pedido');
+    }
   };
 
   const pedidosFiltrados = filtroEstado === 'todos' 
@@ -173,7 +154,7 @@ const EmpleadoPanel = () => {
               pedidosFiltrados.map(pedido => (
                 <div key={pedido.id} className={styles.pedidoCard}>
                   <div className={styles.pedidoHeader}>
-                    <span className={styles.pedidoNumero}>#{pedido.numero}</span>
+                    <span className={styles.pedidoNumero}>#{pedido.numeroPedido}</span>
                     <span 
                       className={styles.pedidoEstado} 
                       style={{ background: estados[pedido.estado]?.color || '#999' }}
@@ -183,23 +164,20 @@ const EmpleadoPanel = () => {
                   </div>
                   
                   <div className={styles.pedidoInfo}>
-                    <div><strong>Cliente:</strong> {pedido.cliente}</div>
-                    <div><strong>Fecha:</strong> {pedido.fecha}</div>
+                    <div><strong>Cliente:</strong> {pedido.usuario?.nombre || 'Cliente no registrado'}</div>
+                    <div><strong>Fecha:</strong> {new Date(pedido.fechaPedido).toLocaleString()}</div>
+                    <div><strong>Total:</strong> ${pedido.total}</div>
                   </div>
                   
                   <div className={styles.pedidoItems}>
                     <strong>Productos:</strong>
                     <ul>
-                      {pedido.items.map((item, idx) => (
+                      {pedido.detalles?.map((item, idx) => (
                         <li key={idx}>
-                          {item.cantidad}x {item.nombre} - ${item.cantidad * item.precio}
+                          {item.cantidad}x {item.nombreProducto} - ${item.cantidad * item.precioUnitario}
                         </li>
                       ))}
                     </ul>
-                  </div>
-                  
-                  <div className={styles.pedidoTotal}>
-                    <strong>Total:</strong> ${pedido.total}
                   </div>
                   
                   <div className={styles.pedidoAcciones}>
