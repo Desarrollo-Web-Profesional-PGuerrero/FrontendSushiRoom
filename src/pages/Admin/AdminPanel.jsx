@@ -4,12 +4,12 @@ import { useAdmin } from '../../hooks/useAdmin';
 import useSessionTimeout from "../../hooks/useSessionTimeout";
 import SessionWarning from "../../components/SessionWarning/SessionWarning";
 import styles from './AdminPanel.module.css';
+import { API_URL } from '../../services/api';
 
 const AdminPanel = () => {
   const { logout, productos, agregarProducto, editarProducto, eliminarProducto, user, categorias: categoriasBackend } = useAdmin();
   const navigate = useNavigate();
   
-  // Manejo de sesión por inactividad (30 minutos)
   console.log('📦 AdminPanel montado - Llamando a useSessionTimeout');
   useSessionTimeout(10);
   
@@ -18,7 +18,6 @@ const AdminPanel = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [editandoId, setEditandoId] = useState(null);
 
-  // Estado para gestión de empleados
   const [usuarios, setUsuarios] = useState([]);
   const [showUserForm, setShowUserForm] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -42,7 +41,6 @@ const AdminPanel = () => {
   const [pedidoSeleccionado, setPedidoSeleccionado] = useState(null);
   const [modalAbierto, setModalAbierto] = useState(false);
 
-  // Listas predeterminadas
   const paisesOrigen = [
     'Japón', 'Noruega', 'Chile', 'España', 'México',
     'Perú', 'Canadá', 'Estados Unidos', 'Francia', 'Italia',
@@ -70,12 +68,10 @@ const AdminPanel = () => {
   const [nuevoOrigen, setNuevoOrigen] = useState('');
   const [nuevoIngrediente, setNuevoIngrediente] = useState('');
 
-  // Cargar usuarios al iniciar
   useEffect(() => {
     cargarUsuarios();
   }, []);
 
-  // Establecer categoría por defecto cuando se cargan las categorías del backend
   useEffect(() => {
     if (categoriasBackend && categoriasBackend.length > 0 && !formData.categoria) {
       setFormData(prev => ({
@@ -87,7 +83,7 @@ const AdminPanel = () => {
 
   const cargarUsuarios = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/usuarios');
+      const response = await fetch(`${API_URL}/usuarios`);
       if (response.ok) {
         const data = await response.json();
         setUsuarios(data);
@@ -100,7 +96,7 @@ const AdminPanel = () => {
   const crearEmpleado = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:8080/api/usuarios', {
+      const response = await fetch(`${API_URL}/usuarios`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(nuevoEmpleado)
@@ -123,7 +119,7 @@ const AdminPanel = () => {
   const eliminarEmpleado = async (id) => {
     if (window.confirm('¿Eliminar este empleado?')) {
       try {
-        const response = await fetch(`http://localhost:8080/api/usuarios/${id}`, {
+        const response = await fetch(`${API_URL}/usuarios/${id}`, {
           method: 'DELETE'
         });
         if (response.ok) {
@@ -136,7 +132,6 @@ const AdminPanel = () => {
     }
   };
 
-  // Función para editar empleado
   const handleEditEmpleado = (empleado) => {
     setEditandoEmpleado(empleado);
     setEmpleadoEditForm({
@@ -149,7 +144,7 @@ const AdminPanel = () => {
   const actualizarEmpleado = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`http://localhost:8080/api/usuarios/${editandoEmpleado.id}`, {
+      const response = await fetch(`${API_URL}/usuarios/${editandoEmpleado.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(empleadoEditForm)
@@ -303,7 +298,6 @@ const AdminPanel = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
 
-  // Estados de pedidos
   const estadosPedido = {
     pendiente: { label: 'Pendiente', color: '#ff9800', icon: '⏳', bg: 'rgba(255, 152, 0, 0.1)' },
     preparacion: { label: 'En preparación', color: '#2196f3', icon: '👨‍🍳', bg: 'rgba(33, 150, 243, 0.1)' },
@@ -314,7 +308,7 @@ const AdminPanel = () => {
   const cargarPedidos = async () => {
     setLoadingPedidos(true);
     try {
-      const response = await fetch('http://localhost:8080/api/pedidos');
+      const response = await fetch(`${API_URL}/pedidos`);
       if (response.ok) {
         const data = await response.json();
         setPedidos(data);
@@ -329,7 +323,7 @@ const AdminPanel = () => {
 
   const cargarResumenPedidos = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/pedidos/resumen');
+      const response = await fetch(`${API_URL}/pedidos/resumen`);
       if (response.ok) {
         const data = await response.json();
         setResumenPedidos(data);
@@ -341,7 +335,7 @@ const AdminPanel = () => {
 
   const cambiarEstadoPedido = async (id, nuevoEstado) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/pedidos/${id}/estado`, {
+      const response = await fetch(`${API_URL}/pedidos/${id}/estado`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ estado: nuevoEstado })
@@ -356,11 +350,10 @@ const AdminPanel = () => {
     }
   };
 
-  // Función para ver detalles del pedido
   const verDetallesPedido = async (id) => {
     try {
       console.log('Cargando detalles del pedido:', id);
-      const response = await fetch(`http://localhost:8080/api/pedidos/${id}`);
+      const response = await fetch(`${API_URL}/pedidos/${id}`);
       if (response.ok) {
         const data = await response.json();
         console.log('Detalles recibidos:', data);
@@ -790,7 +783,6 @@ const AdminPanel = () => {
               </form>
             )}
 
-            {/* Modal de edición de empleado */}
             {editandoEmpleado && (
               <div className={styles.modal} onClick={() => setEditandoEmpleado(null)}>
                 <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
@@ -905,7 +897,6 @@ const AdminPanel = () => {
               </div>
             </div>
 
-            {/* Tarjetas de resumen */}
             <div className={styles.resumenContainer}>
               <div className={styles.resumenCard} style={{ background: '#FFF3E0', borderLeft: '4px solid #FF9800' }}>
                 <div>
@@ -933,7 +924,6 @@ const AdminPanel = () => {
               </div>
             </div>
 
-            {/* Filtros */}
             <div className={styles.filtrosContainer}>
               <button
                 className={`${styles.filtroBtn} ${filtroEstado === 'todos' ? styles.filtroActivo : ''}`}
@@ -1048,7 +1038,6 @@ const AdminPanel = () => {
           </div>
         )}
 
-        {/* Modal de detalles del pedido */}
         {modalAbierto && pedidoSeleccionado && (
           <div className={styles.modal} onClick={() => setModalAbierto(false)}>
             <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
