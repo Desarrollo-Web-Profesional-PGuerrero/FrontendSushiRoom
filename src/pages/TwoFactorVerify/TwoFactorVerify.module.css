@@ -1,0 +1,161 @@
+/* src/pages/TwoFactorVerify/TwoFactorVerify.module.css */
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #fef9f5 0%, #fff5ef 100%);
+  padding: 1rem;
+}
+
+.card {
+  background: white;
+  border-radius: 24px;
+  padding: 2.5rem;
+  max-width: 450px;
+  width: 100%;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.card h1 {
+  font-size: 1.8rem;
+  color: #2f5d3a;
+  margin-bottom: 0.5rem;
+  font-family: 'Playfair Display', serif;
+}
+
+.description {
+  color: #8b7355;
+  font-size: 0.9rem;
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: left;
+}
+
+.formGroup label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #2f5d3a;
+  text-transform: uppercase;
+}
+
+.codeInput {
+  padding: 0.8rem 1rem;
+  border: 1px solid #e3dbce;
+  border-radius: 12px;
+  font-size: 1.2rem;
+  text-align: center;
+  letter-spacing: 4px;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.codeInput:focus {
+  outline: none;
+  border-color: #ff8a5e;
+  box-shadow: 0 0 0 2px rgba(255, 138, 94, 0.1);
+}
+
+.submitBtn {
+  background: #1a1a1a;
+  color: white;
+  border: none;
+  padding: 0.8rem;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.submitBtn:hover:not(:disabled) {
+  background: #ff8a5e;
+  transform: translateY(-2px);
+}
+
+.submitBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.error {
+  background: rgba(255, 68, 68, 0.1);
+  color: #ff4444;
+  padding: 0.8rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.resendContainer {
+  text-align: center;
+}
+
+.countdown {
+  color: #8b7355;
+  font-size: 0.8rem;
+}
+
+.resendBtn {
+  background: transparent;
+  color: #ff8a5e;
+  border: none;
+  cursor: pointer;
+  font-size: 0.8rem;
+  text-decoration: underline;
+}
+
+.resendBtn:hover {
+  color: #e94560;
+}
+
+.backLink {
+  background: transparent;
+  color: #8b7355;
+  border: none;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: color 0.3s;
+}
+
+.backLink:hover {
+  color: #ff8a5e;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .card {
+    padding: 1.5rem;
+  }
+
+  .card h1 {
+    font-size: 1.5rem;
+  }
+
+  .description {
+    font-size: 0.8rem;
+  }
+
+  .codeInput {
+    font-size: 1rem;
+    letter-spacing: 2px;
+  }
+}

@@ -1,15 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdmin } from '../../hooks/useAdmin';
+import useSessionTimeout from "../../hooks/useSessionTimeout";
+import SessionWarning from "../../components/SessionWarning/SessionWarning";
 import styles from './EmpleadoPanel.module.css';
 
 const EmpleadoPanel = () => {
   const { logout, user } = useAdmin();
   const navigate = useNavigate();
+  
+  // ✅ Cambiado a 10 minuto
+  useSessionTimeout(10);
+  
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [filtroEstado, setFiltroEstado] = useState('todos');
+  
+  // ✅ Agregar key para reiniciar SessionWarning
+  const [warningKey, setWarningKey] = useState(0);
 
   const handleLogout = () => {
     logout();
@@ -18,6 +27,12 @@ const EmpleadoPanel = () => {
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
+  };
+  
+  // ✅ Función para extender sesión
+  const handleExtendSession = () => {
+    setWarningKey(prev => prev + 1);
+    window.dispatchEvent(new Event('mousemove'));
   };
 
   // Estados de pedidos
@@ -30,13 +45,11 @@ const EmpleadoPanel = () => {
 
   // Cargar pedidos (simulado - después conectas con tu backend)
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/immutability
     cargarPedidos();
   }, []);
 
   const cargarPedidos = async () => {
     setLoading(true);
-    // Simulación - después reemplazar con fetch real
     setTimeout(() => {
       const pedidosEjemplo = [
         {
@@ -81,10 +94,8 @@ const EmpleadoPanel = () => {
   };
 
   const cambiarEstado = async (pedidoId, nuevoEstado) => {
-    // Aquí iría la llamada al backend
     console.log(`Cambiando pedido ${pedidoId} a ${nuevoEstado}`);
     
-    // Actualizar localmente
     setPedidos(pedidos.map(pedido => 
       pedido.id === pedidoId ? { ...pedido, estado: nuevoEstado } : pedido
     ));
@@ -96,6 +107,12 @@ const EmpleadoPanel = () => {
 
   return (
     <div className={styles.empleadoPanel}>
+      <SessionWarning 
+        key={warningKey}
+        timeoutMinutes={10} 
+        onExtend={handleExtendSession}
+      />
+      
       <button className={styles.menuHamburger} onClick={toggleMobileMenu}>
         <span>☰</span>
       </button>
@@ -132,7 +149,6 @@ const EmpleadoPanel = () => {
           <p>Administra los pedidos de los clientes</p>
         </div>
 
-        {/* Filtros */}
         <div className={styles.filtrosContainer}>
           {['todos', 'pendiente', 'preparacion', 'listo', 'entregado'].map(estado => (
             <button

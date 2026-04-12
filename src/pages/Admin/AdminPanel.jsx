@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdmin } from '../../hooks/useAdmin';
+import useSessionTimeout from "../../hooks/useSessionTimeout";
+import SessionWarning from "../../components/SessionWarning/SessionWarning";
 import styles from './AdminPanel.module.css';
 
 const AdminPanel = () => {
   const { logout, productos, agregarProducto, editarProducto, eliminarProducto, user, categorias: categoriasBackend } = useAdmin();
   const navigate = useNavigate();
+  
+  // Manejo de sesión por inactividad (30 minutos)
+  console.log('📦 AdminPanel montado - Llamando a useSessionTimeout');
+  useSessionTimeout(10);
+  
   const [activeTab, setActiveTab] = useState('productos');
   const [showForm, setShowForm] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -15,6 +22,12 @@ const AdminPanel = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [showUserForm, setShowUserForm] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [editandoEmpleado, setEditandoEmpleado] = useState(null);
+  const [empleadoEditForm, setEmpleadoEditForm] = useState({
+    nombre: '',
+    email: '',
+    rol: 'empleado'
+  });
   const [nuevoEmpleado, setNuevoEmpleado] = useState({
     nombre: '',
     email: '',
@@ -120,6 +133,37 @@ const AdminPanel = () => {
       } catch (error) {
         console.error('Error al eliminar empleado:', error);
       }
+    }
+  };
+
+  // Función para editar empleado
+  const handleEditEmpleado = (empleado) => {
+    setEditandoEmpleado(empleado);
+    setEmpleadoEditForm({
+      nombre: empleado.nombre,
+      email: empleado.email,
+      rol: empleado.rol || 'empleado'
+    });
+  };
+
+  const actualizarEmpleado = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(`http://localhost:8080/api/usuarios/${editandoEmpleado.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(empleadoEditForm)
+      });
+      if (response.ok) {
+        alert('Empleado actualizado exitosamente');
+        setEditandoEmpleado(null);
+        cargarUsuarios();
+      } else {
+        alert('Error al actualizar empleado');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error al actualizar empleado');
     }
   };
 
@@ -320,7 +364,6 @@ const AdminPanel = () => {
       if (response.ok) {
         const data = await response.json();
         console.log('Detalles recibidos:', data);
-        // La respuesta viene como { pedido: {...}, detalles: [...] }
         setPedidoSeleccionado(data);
         setModalAbierto(true);
       } else {
@@ -348,6 +391,10 @@ const AdminPanel = () => {
 
   return (
     <div className={styles.adminPanel}>
+      <SessionWarning timeoutMinutes={5} onExtend={() => {
+        window.dispatchEvent(new Event('mousemove'));
+      }} />
+      
       <button className={styles.menuHamburger} onClick={toggleMobileMenu}>
         <span className={styles.hamburgerIcon}>☰</span>
       </button>
@@ -743,6 +790,56 @@ const AdminPanel = () => {
               </form>
             )}
 
+            {/* Modal de edición de empleado */}
+            {editandoEmpleado && (
+              <div className={styles.modal} onClick={() => setEditandoEmpleado(null)}>
+                <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+                  <div className={styles.modalHeader}>
+                    <h3>Editar Empleado</h3>
+                    <button className={styles.modalClose} onClick={() => setEditandoEmpleado(null)}>✕</button>
+                  </div>
+                  <form onSubmit={actualizarEmpleado} className={styles.userForm}>
+                    <div className={styles.formGrid}>
+                      <div className={styles.formGroup}>
+                        <label>Nombre completo</label>
+                        <input
+                          type="text"
+                          value={empleadoEditForm.nombre}
+                          onChange={(e) => setEmpleadoEditForm({...empleadoEditForm, nombre: e.target.value})}
+                          required
+                        />
+                      </div>
+                      <div className={styles.formGroup}>
+                        <label>Email</label>
+                        <input
+                          type="email"
+                          value={empleadoEditForm.email}
+                          onChange={(e) => setEmpleadoEditForm({...empleadoEditForm, email: e.target.value})}
+                          required
+                        />
+                      </div>
+                      <div className={styles.formGroup}>
+                        <label>Rol</label>
+                        <select
+                          value={empleadoEditForm.rol}
+                          onChange={(e) => setEmpleadoEditForm({...empleadoEditForm, rol: e.target.value})}
+                        >
+                          <option value="empleado">Empleado</option>
+                          <option value="admin">Administrador</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className={styles.formActions}>
+                      <button type="submit" className={styles.saveBtn}>Guardar Cambios</button>
+                      <button type="button" onClick={() => setEditandoEmpleado(null)} className={styles.cancelBtn}>
+                        Cancelar
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+
             <div className={styles.productosList}>
               <div className={styles.tableWrapper}>
                 <table className={styles.table}>
@@ -765,13 +862,22 @@ const AdminPanel = () => {
                           <span className={styles.categoriaBadge}>👨‍🍳 Empleado</span>
                         </td>
                         <td data-label="Acciones">
-                          <button
-                            onClick={() => eliminarEmpleado(usuario.id)}
-                            className={styles.eliminarBtn}
-                            title="Eliminar"
-                          >
-                            ✘
-                          </button>
+                          <div className={styles.acciones}>
+                            <button
+                              onClick={() => handleEditEmpleado(usuario)}
+                              className={styles.editarBtn}
+                              title="Editar"
+                            >
+                              ✏️
+                            </button>
+                            <button
+                              onClick={() => eliminarEmpleado(usuario.id)}
+                              className={styles.eliminarBtn}
+                              title="Eliminar"
+                            >
+                              ✘
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -788,6 +894,7 @@ const AdminPanel = () => {
             </div>
           </div>
         )}
+
         {/* Sección de Pedidos */}
         {activeTab === 'pedidos' && (
           <div className={styles.pedidosSection}>
@@ -826,7 +933,7 @@ const AdminPanel = () => {
               </div>
             </div>
 
-            {/* Filtros sin emojis */}
+            {/* Filtros */}
             <div className={styles.filtrosContainer}>
               <button
                 className={`${styles.filtroBtn} ${filtroEstado === 'todos' ? styles.filtroActivo : ''}`}
