@@ -132,6 +132,7 @@ export const AdminProvider = ({ children }) => {
 
       const productoBackend = {
         nombre: producto.nombre,
+        ingredientes: producto.ingredientes || '',
         descripcion: producto.descripcion || '',
         origen: producto.origen || '',
         notasCata: producto.notasCata || '',

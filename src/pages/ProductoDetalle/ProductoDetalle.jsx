@@ -19,31 +19,27 @@ const ProductoDetalle = () => {
     notasChef: "",
   });
 
-  // Definir qué categorías permiten personalización
   const categoriasConPersonalizacion = ["nigiri", "roll", "sashimi", "maki"];
-  
-  // Definir qué productos NO deben tener personalización (bebidas, etc.)
+
   const productosSinPersonalizacion = [
-    "coca", "coca cola", "pepsi", "sprite", "fanta", 
+    "coca", "coca cola", "pepsi", "sprite", "fanta",
     "agua", "te", "té", "cerveza", "sake", "jugo",
     "bebida", "refresco"
   ];
 
   const debeMostrarPersonalizacion = () => {
     if (!producto) return false;
-    
+
     const nombreLower = producto.nombre.toLowerCase();
     const categoriaLower = producto.categoria?.toLowerCase() || "";
-    
-    // Verificar si es una bebida o producto que no debe tener personalización
-    const esBebida = productosSinPersonalizacion.some(item => 
+
+    const esBebida = productosSinPersonalizacion.some(item =>
       nombreLower.includes(item)
     );
-    
+
     if (esBebida) return false;
-    
-    // Verificar si la categoría permite personalización
-    return categoriasConPersonalizacion.some(cat => 
+
+    return categoriasConPersonalizacion.some(cat =>
       categoriaLower.includes(cat) || nombreLower.includes(cat)
     );
   };
@@ -52,10 +48,27 @@ const ProductoDetalle = () => {
     cargarProducto();
   }, [id]);
 
+  const extraerIngredientes = (data) => {
+    // Si vienen ingredientes desde BD
+    if (data.ingredientes && typeof data.ingredientes === 'string' && data.ingredientes.trim()) {
+      return data.ingredientes.split(',').map(i => i.trim());
+    }
+
+    if (Array.isArray(data.ingredientes) && data.ingredientes.length > 0) {
+      return data.ingredientes;
+    }
+
+    // Si no hay ingredientes en BD, mostrar mensaje
+    return ["Sin información de ingredientes"];
+  };
+
   const cargarProducto = async () => {
     try {
       setLoading(true);
       const data = await getProductoById(id);
+
+      console.log("📦 Datos del backend:", data);
+      console.log("🔍 Ingredientes recibidos:", data.ingredientes);
 
       if (data) {
         const productoFormateado = {
@@ -66,9 +79,10 @@ const ProductoDetalle = () => {
           descripcion: data.descripcion || "Delicioso platillo de nuestra cocina",
           origen: data.origen || "Japón",
           notasCata: data.notasCata || "Sabor fresco y auténtico",
-          ingredientes: data.ingredientes || ["Información de ingredientes no disponible"],
+          ingredientes: extraerIngredientes(data),
           categoria: data.categoriaNombre || "Especialidad",
         };
+
         setProducto(productoFormateado);
         setError(null);
       } else {
@@ -82,10 +96,26 @@ const ProductoDetalle = () => {
     }
   };
 
+  const esBebida = () => {
+    if (!producto) return false;
+
+    const nombreLower = producto.nombre.toLowerCase();
+    const categoriaLower = producto.categoria?.toLowerCase() || "";
+
+    const bebidasKeywords = [
+      "coca", "coca cola", "pepsi", "sprite", "fanta",
+      "agua", "te", "té", "cerveza", "sake", "jugo",
+      "bebida", "refresco", "café", "cafe"
+    ];
+
+    return bebidasKeywords.some(keyword =>
+      nombreLower.includes(keyword) || categoriaLower.includes(keyword)
+    );
+  };
+
   const handleAgregarCarrito = () => {
     let productoFinal = { ...producto };
-    
-    // Solo agregar personalización si aplica
+
     if (debeMostrarPersonalizacion()) {
       productoFinal = {
         ...producto,
@@ -96,15 +126,15 @@ const ProductoDetalle = () => {
         },
       };
     }
-    
+
     agregarAlCarrito(productoFinal, cantidad);
   };
 
   const getPicanteEmoji = (nivel) => {
-    if (nivel === 0) return "🌶️ Sin picante";
-    if (nivel <= 2) return "🌶️ Suave";
-    if (nivel <= 4) return "🌶️🌶️ Medio";
-    return "🌶️🌶️🌶️ Picante";
+    if (nivel === 0) return "Sin picante";
+    if (nivel <= 2) return "Suave";
+    if (nivel <= 4) return "Medio";
+    return "Picante";
   };
 
   if (loading) {
@@ -137,7 +167,6 @@ const ProductoDetalle = () => {
 
   return (
     <div className={styles.container}>
-      {/* Notificación flotante */}
       {notification?.show && (
         <div className={`${styles.notification} ${styles.notificationShow}`}>
           <span className={styles.notificationIcon}>✓</span>
@@ -166,13 +195,13 @@ const ProductoDetalle = () => {
           <span className={styles.categoria}>{producto.categoria}</span>
           <p className={styles.precio}>${producto.precio.toFixed(2)} MXN</p>
 
-          {/* DESCRIPCIÓN */}
+          {/* Descripción */}
           <div className={styles.section}>
-            <h3>📝 Descripción</h3>
+            <h3>Descripción</h3>
             <p>{producto.descripcion}</p>
           </div>
 
-          {/* ORIGEN - Solo para productos de sushi */}
+          {/* Origen - Solo para sushi */}
           {producto.origen && mostrarPersonalizacion && (
             <div className={styles.section}>
               <h3>Origen</h3>
@@ -180,7 +209,7 @@ const ProductoDetalle = () => {
             </div>
           )}
 
-          {/* NOTAS DE CATA - Solo para productos de sushi */}
+          {/* Notas de cata - Solo para sushi */}
           {producto.notasCata && mostrarPersonalizacion && (
             <div className={styles.section}>
               <h3>Notas de cata</h3>
@@ -188,26 +217,24 @@ const ProductoDetalle = () => {
             </div>
           )}
 
-          {/* INGREDIENTES */}
-          <div className={styles.section}>
-            <h3>Ingredientes</h3>
-            <ul className={styles.ingredientesList}>
-              {Array.isArray(producto.ingredientes) ? (
-                producto.ingredientes.map((ingrediente, index) => (
+          {/* Ingredientes */}
+          {!esBebida() && (
+            <div className={styles.section}>
+              <h3>Ingredientes</h3>
+              <ul className={styles.ingredientesList}>
+                {producto.ingredientes.map((ingrediente, index) => (
                   <li key={index}>{ingrediente}</li>
-                ))
-              ) : (
-                <li>Información de ingredientes no disponible</li>
-              )}
-            </ul>
-          </div>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {mostrarPersonalizacion && (
             <div className={styles.personalizacionSection}>
               <h3>Personaliza tu plato</h3>
 
               <div className={styles.picanteControl}>
-                <label>Nivel de picante</label>
+                <label>🌶️ Nivel de picante</label>
                 <div className={styles.sliderContainer}>
                   <input
                     type="range"
@@ -229,7 +256,7 @@ const ProductoDetalle = () => {
                     <span>Medio</span>
                     <span>Picante</span>
                     <span>Muy</span>
-                    <span>🔥🔥🔥</span>
+                    <span>🔥</span>
                   </div>
                   <div className={styles.picanteValue}>
                     {getPicanteEmoji(personalizacion.nivelPicante)}
@@ -285,7 +312,7 @@ const ProductoDetalle = () => {
 
           <div className={styles.carritoSection}>
             <div className={styles.cantidadControl}>
-              <label htmlFor="cantidad">Cantidad:</label>
+              <label>Cantidad:</label>
               <div className={styles.cantidadInput}>
                 <button
                   onClick={() => setCantidad((prev) => Math.max(1, prev - 1))}
