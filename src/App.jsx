@@ -21,8 +21,7 @@ import EmpleadoPanel from "./pages/Admin/EmpleadoPanel";
 import ConfirmacionPedido from "./pages/ConfirmacionPedido/ConfirmacionPedido";
 import Login from "./pages/Login/Login";
 import NotFound from "./pages/NotFound/NotFound";
-import Breadcrumbs from "./components/Breadcrumbs/Breadcrumbs"; // ← IMPORTAR BREADCRUMBS
-import ForgotPassword from "./pages/ForgotPassword/ForgotPassword";
+import Breadcrumbs from "./components/Breadcrumbs/Breadcrumbs";
 import ResetPassword from "./pages/ResetPassword/ResetPassword";
 import TwoFactorVerify from './pages/TwoFactorVerify/TwoFactorVerify';
 import "./App.css";
@@ -35,7 +34,7 @@ function App() {
           <PedidoProvider>
             <div className="app">
               <Header />
-              <Breadcrumbs /> {/* ← AGREGAR BREADCRUMBS AQUÍ */}
+              <Breadcrumbs />
               <main className="main-content">
                 <Routes>
                   <Route path="/" element={<Home />} />
@@ -44,31 +43,21 @@ function App() {
                   <Route path="/producto/:id" element={<ProductoDetalle />} />
                   <Route path="/carrito" element={<Carrito />} />
                   <Route path="/checkout" element={<Checkout />} />
-                  <Route
-                    path="/confirmacion"
-                    element={<ConfirmacionPedido />}
-                  />
+                  <Route path="/confirmacion" element={<ConfirmacionPedido />} />
                   <Route path="/estado-pedido/:id" element={<EstadoPedido />} />
                   <Route path="/admin/login" element={<AdminLogin />} />
-                  <Route
-                    path="/admin/panel"
-                    element={
-                      <PrivateRoute rolRequerido="admin">
-                        <AdminPanel />
-                      </PrivateRoute>
-                    }
-                  />
-                  <Route
-                    path="/empleado/panel"
-                    element={
-                      <PrivateRoute rolRequerido="empleado">
-                        <EmpleadoPanel />
-                      </PrivateRoute>
-                    }
-                  />
+                  <Route path="/admin/panel" element={
+                    <PrivateRoute rolRequerido="admin">
+                      <AdminPanel />
+                    </PrivateRoute>
+                  } />
+                  <Route path="/empleado/panel" element={
+                    <PrivateRoute rolRequerido="empleado">
+                      <EmpleadoPanel />
+                    </PrivateRoute>
+                  } />
                   <Route path="/login" element={<Login />} />
                   <Route path="/verify-2fa" element={<TwoFactorVerify />} />
-                  <Route path="/forgot-password" element={<ForgotPassword />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>

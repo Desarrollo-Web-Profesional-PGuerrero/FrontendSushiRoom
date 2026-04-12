@@ -1,0 +1,24 @@
+.sitemap {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+.sitemap h1 {
+  color: #2f5d3a;
+  margin-bottom: 1.5rem;
+}
+.sitemap ul {
+  list-style: none;
+  padding: 0;
+}
+.sitemap li {
+  margin: 0.8rem 0;
+}
+.sitemap a {
+  color: #ff8a5e;
+  text-decoration: none;
+  font-size: 1.1rem;
+}
+.sitemap a:hover {
+  text-decoration: underline;
+}
