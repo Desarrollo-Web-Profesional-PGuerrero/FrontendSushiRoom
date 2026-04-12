@@ -229,12 +229,13 @@ const AdminPanel = () => {
       descripcion: formData.descripcion,
       origen: formData.origen.join(', '),
       notasCata: formData.notasCata,
-      ingredientes: formData.ingredientes,
+      ingredientes: formData.ingredientes, // Array de ingredientes
       imagen: formData.imagen || '/src/assets/images/default.jpg',
       disponible: true
     };
 
     console.log('Enviando producto:', productoData);
+    console.log('Ingredientes a guardar:', productoData.ingredientes);
 
     try {
       if (editandoId) {
@@ -271,7 +272,7 @@ const AdminPanel = () => {
       descripcion: producto.descripcion || '',
       origen: producto.origen ? producto.origen.split(', ') : [],
       notasCata: producto.notasCata || '',
-      ingredientes: producto.ingredientes || [],
+      ingredientes: Array.isArray(producto.ingredientes) ? producto.ingredientes : [],
       imagen: producto.imagen || ''
     });
     setShowForm(true);
