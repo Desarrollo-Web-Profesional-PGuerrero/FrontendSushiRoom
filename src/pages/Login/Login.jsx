@@ -3,6 +3,9 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAdmin } from "../../hooks/useAdmin";
 import styles from "./Login.module.css";
 
+// ✅ Importar la variable de entorno
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useAdmin();
@@ -11,7 +14,6 @@ const Login = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   
-  // Estados para recuperar contraseña (modal)
   const [showRecovery, setShowRecovery] = useState(false);
   const [recoveryEmail, setRecoveryEmail] = useState('');
   const [recoveryMessage, setRecoveryMessage] = useState('');
@@ -23,7 +25,8 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8080/api/auth/login', {
+      // ✅ Usar API_URL
+      const response = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -69,7 +72,8 @@ const Login = () => {
     setRecoveryMessage('');
 
     try {
-      const response = await fetch('http://localhost:8080/api/auth/forgot-password', {
+      // ✅ Usar API_URL
+      const response = await fetch(`${API_URL}/auth/forgot-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: recoveryEmail })
@@ -160,7 +164,6 @@ const Login = () => {
         </div>
       </div>
 
-      {/* Modal de recuperación de contraseña */}
       {showRecovery && (
         <div className={styles.modalOverlay} onClick={closeRecoveryModal}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>

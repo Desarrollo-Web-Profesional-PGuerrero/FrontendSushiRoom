@@ -1,6 +1,7 @@
 // src/pages/ForgotPassword/ForgotPassword.jsx
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { API_URL } from '../../services/api';
 import styles from './ForgotPassword.module.css';
 
 const ForgotPassword = () => {
@@ -17,7 +18,8 @@ const ForgotPassword = () => {
     setSuccess(false);
 
     try {
-      const response = await fetch('http://localhost:8080/api/auth/forgot-password', {
+      // ✅ Corregido: usar API_URL
+      const response = await fetch(`${API_URL}/auth/forgot-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
