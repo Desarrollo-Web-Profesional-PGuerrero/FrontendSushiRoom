@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styles from './EstadoPedido.module.css';
+import { API_URL } from '../../services/api';
 
 const EstadoPedido = () => {
   const { id } = useParams();
@@ -230,7 +231,7 @@ const EstadoPedido = () => {
 
       // SEGUNDO: Intentar con el backend
       try {
-        const response = await fetch(`http://localhost:8080/api/pedidos/buscar/${id}`);
+        const response = await fetch(`${API_URL}/pedidos/buscar/${id}`);
 
         if (response.ok) {
           const data = await response.json();

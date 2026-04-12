@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AdminContext } from './AdminContext';
 
-const API_URL = 'http://localhost:8080/api';
+import { API_URL } from '../../services/api';
 
 export const AdminProvider = ({ children }) => {
   const [productos, setProductos] = useState([]);
