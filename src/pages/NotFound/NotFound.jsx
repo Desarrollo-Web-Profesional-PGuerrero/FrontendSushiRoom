@@ -9,54 +9,55 @@ const NotFound = () => {
   return (
     <div className={styles.container}>
       <div className={styles.content}>
-        {/* Animación del sushi */}
-        <div className={styles.sushiAnimation}>
-          <div className={styles.sushiRoll}>
-            <span className={styles.sushiEmoji}>🍣</span>
-            <span className={styles.sushiEmoji}>🥢</span>
-            <span className={styles.sushiEmoji}>🍱</span>
-          </div>
-        </div>
 
-        {/* Código de error */}
+        {/* 404 creativo */}
         <div className={styles.errorCode}>
           <span className={styles.codeNumber}>4</span>
-          <span className={styles.codeZero}>
-            <span className={styles.zeroInner}>0</span>
-            <span className={styles.zeroRing}></span>
-          </span>
+
+          {/* SUSHI COMO 0 */}
+          <img
+            src="https://png.pngtree.com/png-vector/20240810/ourmid/pngtree-how-to-choose-fresh-ingredients-for-sushi-png-image_13425238.png"
+            alt="Sushi roll"
+            className={styles.sushiZero}
+          />
+
           <span className={styles.codeNumber}>4</span>
         </div>
 
-        {/* Mensaje principal */}
-        <h1 className={styles.title}>¡Ups! Página no encontrada</h1>
+        {/* Título */}
+        <h1 className={styles.title}>
+          ¡Ups! Este rollo no existe
+        </h1>
+
+        {/* Mensaje */}
         <p className={styles.message}>
-          Parece que este rollo de sushi se escapó de la carta.<br />
-          No te preocupes, todavía puedes disfrutar de nuestros mejores platillos.
+          Parece que este sushi se perdió en la cocina…<br />
+          pero tenemos muchos más esperándote
         </p>
 
-        {/* Enlaces de ayuda */}
-        <div className={styles.suggestions}>
-          <p className={styles.suggestionTitle}>¿Qué te gustaría hacer?</p>
-          <div className={styles.buttonGroup}>
-            <button onClick={() => navigate(-1)} className={styles.btnBack}>
-              ← Volver atrás
-            </button>
-            <Link to="/" className={styles.btnHome}>
-              🏠 Ir al inicio
-            </Link>
-            <Link to="/menu" className={styles.btnMenu}>
-              🍣 Ver menú
-            </Link>
-          </div>
+        {/* Botones */}
+        <div className={styles.buttons}>
+          <button onClick={() => navigate(-1)} className={styles.btnBack}>
+            ← Regresar
+          </button>
+
+          <Link to="/" className={styles.btnPrimary}>
+            Ir al inicio
+          </Link>
+
+          <Link to="/menu" className={styles.btnSecondary}>
+            Ver menú
+          </Link>
         </div>
 
-        {/* Mensaje divertido */}
-        <div className={styles.funMessage}>
-          <span className={styles.funIcon}>🍣</span>
-          <p>El chef dice: "Este platillo no está en el menú, pero tenemos muchos otros deliciosos"</p>
-          <span className={styles.funIcon}>🥢</span>
+        {/* Decoración flotante */}
+        <div className={styles.floating}>
+          <span>🍣</span>
+          <span>🥢</span>
+          <span>🍤</span>
+          <span>🍱</span>
         </div>
+
       </div>
     </div>
   );

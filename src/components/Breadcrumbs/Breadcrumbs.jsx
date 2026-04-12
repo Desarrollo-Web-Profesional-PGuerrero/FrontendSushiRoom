@@ -28,7 +28,7 @@ const Breadcrumbs = () => {
   }
 
   // Función para obtener el nombre de la ruta
-  const getRouteName = (segment, index, allSegments) => {
+  const getRouteName = (segment) => {
     // Si es un ID de producto (número)
     if (!isNaN(segment)) {
       return 'Detalle del producto';
@@ -40,7 +40,7 @@ const Breadcrumbs = () => {
     <div className={styles.breadcrumbs}>
       <div className={styles.container}>
         <Link to="/" className={styles.link}>
-          <span className={styles.homeIcon}>🏠</span>
+          <span className={styles.homeIcon}>合</span>
           Inicio
         </Link>
         

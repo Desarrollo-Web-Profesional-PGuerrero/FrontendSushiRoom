@@ -27,10 +27,16 @@ export const AdminProvider = ({ children }) => {
     try {
       setLoading(true);
       const response = await fetch(`${API_URL}/productos`);
-      if (!response.ok) throw new Error('Error al cargar productos');
-      const data = await response.json();
 
-      const productosFormateados = data.map(producto => ({
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log('Productos recibidos del backend:', data);
+
+      // Si data es un array, procesarlo
+      const productosFormateados = Array.isArray(data) ? data.map(producto => ({
         id: producto.id,
         nombre: producto.nombre,
         precio: producto.precio,
@@ -41,12 +47,14 @@ export const AdminProvider = ({ children }) => {
         categoriaId: producto.categoriaId,
         disponible: producto.activo,
         imagen: producto.imagenUrl || '/src/assets/images/default.jpg',
-        ingredientes: []
-      }));
+        ingredientes: producto.ingredientes || []
+      })) : [];
 
       setProductos(productosFormateados);
+
     } catch (error) {
       console.error('Error al cargar productos:', error);
+      setProductos([]); // Vacío en caso de error
     } finally {
       setLoading(false);
     }
@@ -87,7 +95,7 @@ export const AdminProvider = ({ children }) => {
           email: data.email,
           rol: data.rol
         }));
-        
+
         setIsAuthenticated(true);
         setUser({ nombre: data.nombre, email: data.email, rol: data.rol });
         return true;
@@ -156,7 +164,7 @@ export const AdminProvider = ({ children }) => {
       const categoriaSeleccionada = categorias.find(
         c => c.nombre.toLowerCase() === productoActualizado.categoria.toLowerCase()
       );
-      
+
       const productoBackend = {
         nombre: productoActualizado.nombre,
         descripcion: productoActualizado.descripcion || '',
@@ -167,26 +175,26 @@ export const AdminProvider = ({ children }) => {
         activo: true,
         categoriaId: categoriaSeleccionada?.id || 2
       };
-      
+
       console.log('✏️ Editando producto:', { id, productoBackend });
-      
+
       const response = await fetch(`${API_URL}/productos/${id}`, {
         method: 'PUT',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(productoBackend)
       });
-      
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Error response:', errorText);
         throw new Error(`Error ${response.status}: ${errorText}`);
       }
-      
+
       const data = await response.json();
       console.log('✅ Producto actualizado:', data);
-      
+
       await cargarProductos();
       return data;
     } catch (error) {

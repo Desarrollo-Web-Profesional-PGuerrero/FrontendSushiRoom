@@ -14,6 +14,7 @@ export const CarritoProvider = ({ children }) => {
     const savedCart = localStorage.getItem("carrito");
     if (savedCart) {
       try {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setCarrito(JSON.parse(savedCart));
       } catch (e) {
         console.error("Error al cargar carrito:", e);
@@ -38,13 +39,13 @@ export const CarritoProvider = ({ children }) => {
   // Calcular total de items
   const totalItems = carrito.reduce(
     (sum, item) => sum + (item.cantidad || 0),
-    0,
+    0
   );
 
   // Calcular precio total
   const totalPrecio = carrito.reduce(
     (sum, item) => sum + (item.precio || 0) * (item.cantidad || 0),
-    0,
+    0
   );
 
   const agregarAlCarrito = (producto, cantidad = 1) => {
@@ -55,7 +56,7 @@ export const CarritoProvider = ({ children }) => {
         const nuevoCarrito = prevCarrito.map((item) =>
           item.id === producto.id
             ? { ...item, cantidad: (item.cantidad || 0) + cantidad }
-            : item,
+            : item
         );
         showNotification(`+${cantidad} ${producto.nombre} agregado`);
         return nuevoCarrito;
@@ -67,9 +68,7 @@ export const CarritoProvider = ({ children }) => {
   };
 
   const eliminarDelCarrito = (productoId) => {
-    setCarrito((prevCarrito) =>
-      prevCarrito.filter((item) => item.id !== productoId),
-    );
+    setCarrito((prevCarrito) => prevCarrito.filter((item) => item.id !== productoId));
     showNotification("Producto eliminado del carrito");
   };
 
@@ -81,8 +80,8 @@ export const CarritoProvider = ({ children }) => {
 
     setCarrito((prevCarrito) =>
       prevCarrito.map((item) =>
-        item.id === productoId ? { ...item, cantidad: nuevaCantidad } : item,
-      ),
+        item.id === productoId ? { ...item, cantidad: nuevaCantidad } : item
+      )
     );
   };
 

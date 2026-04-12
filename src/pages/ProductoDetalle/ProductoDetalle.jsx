@@ -19,6 +19,35 @@ const ProductoDetalle = () => {
     notasChef: "",
   });
 
+  // Definir qué categorías permiten personalización
+  const categoriasConPersonalizacion = ["nigiri", "roll", "sashimi", "maki"];
+  
+  // Definir qué productos NO deben tener personalización (bebidas, etc.)
+  const productosSinPersonalizacion = [
+    "coca", "coca cola", "pepsi", "sprite", "fanta", 
+    "agua", "te", "té", "cerveza", "sake", "jugo",
+    "bebida", "refresco"
+  ];
+
+  const debeMostrarPersonalizacion = () => {
+    if (!producto) return false;
+    
+    const nombreLower = producto.nombre.toLowerCase();
+    const categoriaLower = producto.categoria?.toLowerCase() || "";
+    
+    // Verificar si es una bebida o producto que no debe tener personalización
+    const esBebida = productosSinPersonalizacion.some(item => 
+      nombreLower.includes(item)
+    );
+    
+    if (esBebida) return false;
+    
+    // Verificar si la categoría permite personalización
+    return categoriasConPersonalizacion.some(cat => 
+      categoriaLower.includes(cat) || nombreLower.includes(cat)
+    );
+  };
+
   useEffect(() => {
     cargarProducto();
   }, [id]);
@@ -34,13 +63,11 @@ const ProductoDetalle = () => {
           nombre: data.nombre,
           precio: parseFloat(data.precio),
           imagen: data.imagenUrl || "/images/default.jpg",
-          descripcion:
-            data.descripcion || "Delicioso platillo de nuestra cocina",
-          ingredientes: data.ingredientes || [
-            "Arroz",
-            "Alga nori",
-            "Pescado fresco",
-          ],
+          descripcion: data.descripcion || "Delicioso platillo de nuestra cocina",
+          origen: data.origen || "Japón",
+          notasCata: data.notasCata || "Sabor fresco y auténtico",
+          ingredientes: data.ingredientes || ["Información de ingredientes no disponible"],
+          categoria: data.categoriaNombre || "Especialidad",
         };
         setProducto(productoFormateado);
         setError(null);
@@ -56,25 +83,28 @@ const ProductoDetalle = () => {
   };
 
   const handleAgregarCarrito = () => {
-    const productoConPersonalizacion = {
-      ...producto,
-      personalizacion: {
-        nivelPicante: personalizacion.nivelPicante,
-        tipoArroz:
-          personalizacion.tipoArroz === "blanco"
-            ? "Arroz blanco"
-            : "Arroz integral",
-        notasChef: personalizacion.notasChef,
-      },
-    };
-    agregarAlCarrito(productoConPersonalizacion, cantidad);
+    let productoFinal = { ...producto };
+    
+    // Solo agregar personalización si aplica
+    if (debeMostrarPersonalizacion()) {
+      productoFinal = {
+        ...producto,
+        personalizacion: {
+          nivelPicante: personalizacion.nivelPicante,
+          tipoArroz: personalizacion.tipoArroz === "blanco" ? "Arroz blanco" : "Arroz integral",
+          notasChef: personalizacion.notasChef,
+        },
+      };
+    }
+    
+    agregarAlCarrito(productoFinal, cantidad);
   };
 
   const getPicanteEmoji = (nivel) => {
-    if (nivel === 0) return "🌶️  Sin picante";
-    if (nivel <= 2) return "🌶️  Suave";
-    if (nivel <= 4) return "🌶️🌶️  Medio";
-    return "🌶️🌶️🌶️  Picante";
+    if (nivel === 0) return "🌶️ Sin picante";
+    if (nivel <= 2) return "🌶️ Suave";
+    if (nivel <= 4) return "🌶️🌶️ Medio";
+    return "🌶️🌶️🌶️ Picante";
   };
 
   if (loading) {
@@ -85,10 +115,7 @@ const ProductoDetalle = () => {
     return (
       <div className={styles.notFound}>
         <h2>{error}</h2>
-        <button
-          onClick={() => navigate("/menu")}
-          className={styles.backButtonLarge}
-        >
+        <button onClick={() => navigate("/menu")} className={styles.backButtonLarge}>
           Volver al menú
         </button>
       </div>
@@ -99,15 +126,14 @@ const ProductoDetalle = () => {
     return (
       <div className={styles.notFound}>
         <h2>Producto no encontrado</h2>
-        <button
-          onClick={() => navigate("/menu")}
-          className={styles.backButtonLarge}
-        >
+        <button onClick={() => navigate("/menu")} className={styles.backButtonLarge}>
           Volver al menú
         </button>
       </div>
     );
   }
+
+  const mostrarPersonalizacion = debeMostrarPersonalizacion();
 
   return (
     <div className={styles.container}>
@@ -137,93 +163,32 @@ const ProductoDetalle = () => {
 
         <div className={styles.infoSection}>
           <h1 className={styles.nombre}>{producto.nombre}</h1>
+          <span className={styles.categoria}>{producto.categoria}</span>
           <p className={styles.precio}>${producto.precio.toFixed(2)} MXN</p>
 
+          {/* DESCRIPCIÓN */}
           <div className={styles.section}>
-            <h3>Descripción</h3>
+            <h3>📝 Descripción</h3>
             <p>{producto.descripcion}</p>
           </div>
 
-          {/* Personalización del plato */}
-          <div className={styles.personalizacionSection}>
-            <h3>Personaliza tu plato</h3>
-
-            <div className={styles.picanteControl}>
-              <label>🌶️ Nivel de picante</label>
-              <div className={styles.sliderContainer}>
-                <input
-                  type="range"
-                  min="0"
-                  max="5"
-                  step="1"
-                  value={personalizacion.nivelPicante}
-                  onChange={(e) =>
-                    setPersonalizacion({
-                      ...personalizacion,
-                      nivelPicante: parseInt(e.target.value),
-                    })
-                  }
-                  className={styles.slider}
-                />
-                <div className={styles.picanteLabels}>
-                  <span>Sin</span>
-                  <span>Suave</span>
-                  <span>Medio</span>
-                  <span>Picante</span>
-                  <span>Muy</span>
-                  <span>🔥</span>
-                </div>
-                <div className={styles.picanteValue}>
-                  {getPicanteEmoji(personalizacion.nivelPicante)}
-                </div>
-              </div>
+          {/* ORIGEN - Solo para productos de sushi */}
+          {producto.origen && mostrarPersonalizacion && (
+            <div className={styles.section}>
+              <h3>Origen</h3>
+              <p>{producto.origen}</p>
             </div>
+          )}
 
-            <div className={styles.arrozControl}>
-              <label>🍚 Tipo de arroz</label>
-              <div className={styles.arrozOptions}>
-                <button
-                  className={`${styles.arrozBtn} ${personalizacion.tipoArroz === "blanco" ? styles.arrozBtnActive : ""}`}
-                  onClick={() =>
-                    setPersonalizacion({
-                      ...personalizacion,
-                      tipoArroz: "blanco",
-                    })
-                  }
-                >
-                  Arroz blanco
-                </button>
-                <button
-                  className={`${styles.arrozBtn} ${personalizacion.tipoArroz === "integral" ? styles.arrozBtnActive : ""}`}
-                  onClick={() =>
-                    setPersonalizacion({
-                      ...personalizacion,
-                      tipoArroz: "integral",
-                    })
-                  }
-                >
-                  Arroz integral
-                </button>
-              </div>
+          {/* NOTAS DE CATA - Solo para productos de sushi */}
+          {producto.notasCata && mostrarPersonalizacion && (
+            <div className={styles.section}>
+              <h3>Notas de cata</h3>
+              <p>{producto.notasCata}</p>
             </div>
+          )}
 
-            <div className={styles.notasControl}>
-              <label>📝 Notas para el chef</label>
-              <textarea
-                value={personalizacion.notasChef}
-                onChange={(e) =>
-                  setPersonalizacion({
-                    ...personalizacion,
-                    notasChef: e.target.value,
-                  })
-                }
-                placeholder="Ej: Sin wasabi, extra salsa, sin gluten, más picante..."
-                rows="3"
-                className={styles.notasTextarea}
-              />
-            </div>
-          </div>
-
+          {/* INGREDIENTES */}
           <div className={styles.section}>
             <h3>Ingredientes</h3>
             <ul className={styles.ingredientesList}>
@@ -236,6 +201,87 @@ const ProductoDetalle = () => {
               )}
             </ul>
           </div>
+
+          {mostrarPersonalizacion && (
+            <div className={styles.personalizacionSection}>
+              <h3>Personaliza tu plato</h3>
+
+              <div className={styles.picanteControl}>
+                <label>Nivel de picante</label>
+                <div className={styles.sliderContainer}>
+                  <input
+                    type="range"
+                    min="0"
+                    max="5"
+                    step="1"
+                    value={personalizacion.nivelPicante}
+                    onChange={(e) =>
+                      setPersonalizacion({
+                        ...personalizacion,
+                        nivelPicante: parseInt(e.target.value),
+                      })
+                    }
+                    className={styles.slider}
+                  />
+                  <div className={styles.picanteLabels}>
+                    <span>Sin</span>
+                    <span>Suave</span>
+                    <span>Medio</span>
+                    <span>Picante</span>
+                    <span>Muy</span>
+                    <span>🔥🔥🔥</span>
+                  </div>
+                  <div className={styles.picanteValue}>
+                    {getPicanteEmoji(personalizacion.nivelPicante)}
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.arrozControl}>
+                <label>Tipo de arroz</label>
+                <div className={styles.arrozOptions}>
+                  <button
+                    className={`${styles.arrozBtn} ${personalizacion.tipoArroz === "blanco" ? styles.arrozBtnActive : ""}`}
+                    onClick={() =>
+                      setPersonalizacion({
+                        ...personalizacion,
+                        tipoArroz: "blanco",
+                      })
+                    }
+                  >
+                    Arroz blanco
+                  </button>
+                  <button
+                    className={`${styles.arrozBtn} ${personalizacion.tipoArroz === "integral" ? styles.arrozBtnActive : ""}`}
+                    onClick={() =>
+                      setPersonalizacion({
+                        ...personalizacion,
+                        tipoArroz: "integral",
+                      })
+                    }
+                  >
+                    Arroz integral
+                  </button>
+                </div>
+              </div>
+
+              <div className={styles.notasControl}>
+                <label>Notas para el chef</label>
+                <textarea
+                  value={personalizacion.notasChef}
+                  onChange={(e) =>
+                    setPersonalizacion({
+                      ...personalizacion,
+                      notasChef: e.target.value,
+                    })
+                  }
+                  placeholder="Ej: Sin wasabi, extra salsa, sin gluten, más picante..."
+                  rows="3"
+                  className={styles.notasTextarea}
+                />
+              </div>
+            </div>
+          )}
 
           <div className={styles.carritoSection}>
             <div className={styles.cantidadControl}>
@@ -257,12 +303,8 @@ const ProductoDetalle = () => {
               </div>
             </div>
 
-            <button
-              onClick={handleAgregarCarrito}
-              className={styles.agregarBtn}
-            >
-              Agregar al carrito - ${(producto.precio * cantidad).toFixed(2)}{" "}
-              MXN
+            <button onClick={handleAgregarCarrito} className={styles.agregarBtn}>
+              Agregar al carrito - ${(producto.precio * cantidad).toFixed(2)} MXN
             </button>
           </div>
         </div>
