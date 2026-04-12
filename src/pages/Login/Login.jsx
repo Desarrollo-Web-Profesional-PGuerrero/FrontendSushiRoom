@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAdmin } from '../../hooks/useAdmin';
-import styles from './Login.module.css';
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAdmin } from "../../hooks/useAdmin";
+import styles from "./Login.module.css";
 
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useAdmin();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   
-  // Estados para recuperar contraseña
+  // Estados para recuperar contraseña (modal)
   const [showRecovery, setShowRecovery] = useState(false);
   const [recoveryEmail, setRecoveryEmail] = useState('');
   const [recoveryMessage, setRecoveryMessage] = useState('');
@@ -19,26 +19,45 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
-      const success = await login(email, password);
-      if (success) {
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-        if (user.rol === 'admin') {
-          navigate('/admin/panel');
-        } else if (user.rol === 'empleado') {
-          navigate('/empleado/panel');
+      const response = await fetch('http://localhost:8080/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        if (data.requiresTwoFactor) {
+          navigate('/verify-2fa', { state: { email: data.email } });
         } else {
-          navigate('/');
+          localStorage.setItem('token', 'logged_in');
+          localStorage.setItem('userRol', data.rol);
+          localStorage.setItem('userName', data.nombre);
+          localStorage.setItem('userEmail', data.email);
+          localStorage.setItem('user', JSON.stringify({
+            nombre: data.nombre,
+            email: data.email,
+            rol: data.rol
+          }));
+
+          if (data.rol === 'admin') {
+            navigate('/admin/panel');
+          } else if (data.rol === 'empleado') {
+            navigate('/empleado/panel');
+          } else {
+            navigate('/');
+          }
         }
       } else {
-        setError('Credenciales incorrectas');
+        setError(data.message || 'Credenciales incorrectas');
       }
-    // eslint-disable-next-line no-unused-vars
     } catch (err) {
-      setError('Error al conectar con el servidor');
+      setError("Error al conectar con el servidor");
     } finally {
       setLoading(false);
     }
@@ -50,7 +69,7 @@ const Login = () => {
     setRecoveryMessage('');
 
     try {
-      const response = await fetch('http://localhost:8080/api/auth/recover-password', {
+      const response = await fetch('http://localhost:8080/api/auth/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: recoveryEmail })
@@ -60,7 +79,6 @@ const Login = () => {
       
       if (data.success) {
         setRecoveryMessage('✅ Se ha enviado un enlace de recuperación a tu correo electrónico');
-        // Cerrar el modal después de 3 segundos si fue exitoso
         setTimeout(() => {
           setShowRecovery(false);
           setRecoveryEmail('');

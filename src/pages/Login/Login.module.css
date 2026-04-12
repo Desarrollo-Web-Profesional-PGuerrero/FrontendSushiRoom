@@ -99,12 +99,28 @@
   text-align: center;
 }
 
+.forgotLink {
+  text-align: center;
+  color: #8b7355;
+  text-decoration: none;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+  display: block;
+  transition: color 0.3s;
+}
+
+.forgotLink:hover {
+  color: #ff8a5e;
+}
+
 .backLink {
   text-align: center;
   color: #8b7355;
   text-decoration: none;
   font-size: 0.8rem;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
+  display: block;
+  transition: color 0.3s;
 }
 
 .backLink:hover {
@@ -297,5 +313,152 @@
   .linksContainer {
     flex-direction: column;
     gap: 0.5rem;
+  }
+}
+
+/* Agrega al final de Login.module.css */
+
+.linksContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.recoverLink {
+  background: none;
+  border: none;
+  color: #8b7355;
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.3s;
+}
+
+.recoverLink:hover {
+  color: #ff8a5e;
+}
+
+/* Modal */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.modalContent {
+  background: white;
+  border-radius: 24px;
+  padding: 2rem;
+  max-width: 450px;
+  width: 90%;
+  animation: fadeIn 0.3s ease;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.modalHeader h3 {
+  color: #2f5d3a;
+  font-size: 1.3rem;
+  margin: 0;
+}
+
+.modalClose {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #8b7355;
+  transition: color 0.3s;
+}
+
+.modalClose:hover {
+  color: #ff8a5e;
+}
+
+.modalActions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.recoveryBtn {
+  flex: 2;
+  background: #1a1a1a;
+  color: white;
+  border: none;
+  padding: 0.7rem;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.recoveryBtn:hover:not(:disabled) {
+  background: #ff8a5e;
+}
+
+.cancelBtn {
+  flex: 1;
+  background: transparent;
+  border: 1px solid #e3dbce;
+  color: #8b7355;
+  padding: 0.7rem;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.cancelBtn:hover {
+  background: #e3dbce;
+}
+
+.modalFooter {
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 0.7rem;
+  color: #8b7355;
+}
+
+.recoveryMessage {
+  padding: 0.7rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  text-align: center;
+  margin: 0.5rem 0;
+}
+
+.successMessage {
+  background: rgba(76, 175, 80, 0.1);
+  color: #4caf50;
+}
+
+.errorMessage {
+  background: rgba(255, 68, 68, 0.1);
+  color: #ff4444;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

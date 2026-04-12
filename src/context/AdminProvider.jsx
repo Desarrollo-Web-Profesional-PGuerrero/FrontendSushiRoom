@@ -37,7 +37,7 @@ export const AdminProvider = ({ children }) => {
         descripcion: producto.descripcion || '',
         origen: producto.origen || '',
         notasCata: producto.notasCata || '',
-        categoria: producto.categoriaNombre?.toLowerCase() || 'roll', // ← Aquí está la clave
+        categoria: producto.categoriaNombre?.toLowerCase() || 'roll',
         categoriaId: producto.categoriaId,
         disponible: producto.activo,
         imagen: producto.imagenUrl || '/src/assets/images/default.jpg',
@@ -65,6 +65,7 @@ export const AdminProvider = ({ children }) => {
     }
   };
 
+  // ✅ FUNCIÓN LOGIN CORREGIDA
   const login = async (email, password) => {
     try {
       const response = await fetch(`${API_URL}/auth/login`, {
@@ -76,12 +77,18 @@ export const AdminProvider = ({ children }) => {
       const data = await response.json();
 
       if (data.success) {
-        setIsAuthenticated(true);
+        // Guardar token y datos del usuario
+        localStorage.setItem('token', 'logged_in');
+        localStorage.setItem('userRol', data.rol);
+        localStorage.setItem('userName', data.nombre);
+        localStorage.setItem('userEmail', data.email);
         localStorage.setItem('user', JSON.stringify({
           nombre: data.nombre,
           email: data.email,
           rol: data.rol
         }));
+        
+        setIsAuthenticated(true);
         setUser({ nombre: data.nombre, email: data.email, rol: data.rol });
         return true;
       }
@@ -94,14 +101,17 @@ export const AdminProvider = ({ children }) => {
 
   const logout = () => {
     setIsAuthenticated(false);
+    localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('userRol');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userEmail');
     setUser(null);
     setProductos([]);
   };
 
   const agregarProducto = async (producto) => {
     try {
-      // Buscar la categoría por nombre
       const categoriaSeleccionada = categorias.find(
         c => c.nombre.toLowerCase() === producto.categoria.toLowerCase()
       );
@@ -119,8 +129,8 @@ export const AdminProvider = ({ children }) => {
         notasCata: producto.notasCata || '',
         precio: parseFloat(producto.precio),
         imagenUrl: producto.imagen,
-        activo: true,  // Siempre activo
-        categoriaId: categoriaSeleccionada.id  // ← SOLO el ID, no el nombre
+        activo: true,
+        categoriaId: categoriaSeleccionada.id
       };
 
       console.log('Enviando al backend:', productoBackend);
@@ -142,48 +152,48 @@ export const AdminProvider = ({ children }) => {
   };
 
   const editarProducto = async (id, productoActualizado) => {
-  try {
-    const categoriaSeleccionada = categorias.find(
-      c => c.nombre.toLowerCase() === productoActualizado.categoria.toLowerCase()
-    );
-    
-    const productoBackend = {
-      nombre: productoActualizado.nombre,
-      descripcion: productoActualizado.descripcion || '',
-      origen: productoActualizado.origen || '',
-      notasCata: productoActualizado.notasCata || '',
-      precio: parseFloat(productoActualizado.precio),
-      imagenUrl: productoActualizado.imagen || '',
-      activo: true,
-      categoriaId: categoriaSeleccionada?.id || 2
-    };
-    
-    console.log('✏️ Editando producto:', { id, productoBackend });
-    
-    const response = await fetch(`${API_URL}/productos/${id}`, {
-      method: 'PUT',
-      headers: { 
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(productoBackend)
-    });
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Error response:', errorText);
-      throw new Error(`Error ${response.status}: ${errorText}`);
+    try {
+      const categoriaSeleccionada = categorias.find(
+        c => c.nombre.toLowerCase() === productoActualizado.categoria.toLowerCase()
+      );
+      
+      const productoBackend = {
+        nombre: productoActualizado.nombre,
+        descripcion: productoActualizado.descripcion || '',
+        origen: productoActualizado.origen || '',
+        notasCata: productoActualizado.notasCata || '',
+        precio: parseFloat(productoActualizado.precio),
+        imagenUrl: productoActualizado.imagen || '',
+        activo: true,
+        categoriaId: categoriaSeleccionada?.id || 2
+      };
+      
+      console.log('✏️ Editando producto:', { id, productoBackend });
+      
+      const response = await fetch(`${API_URL}/productos/${id}`, {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(productoBackend)
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error(`Error ${response.status}: ${errorText}`);
+      }
+      
+      const data = await response.json();
+      console.log('✅ Producto actualizado:', data);
+      
+      await cargarProductos();
+      return data;
+    } catch (error) {
+      console.error('❌ Error al editar producto:', error);
+      throw error;
     }
-    
-    const data = await response.json();
-    console.log('✅ Producto actualizado:', data);
-    
-    await cargarProductos();
-    return data;
-  } catch (error) {
-    console.error('❌ Error al editar producto:', error);
-    throw error;
-  }
-};
+  };
 
   const eliminarProducto = async (id) => {
     if (window.confirm('¿Eliminar este producto?')) {
