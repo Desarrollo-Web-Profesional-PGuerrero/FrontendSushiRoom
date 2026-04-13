@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCarrito } from "../../hooks/useCarrito";
+import { API_URL } from "../../services/api";
 import styles from "./Checkout.module.css";
 
 const Checkout = () => {
@@ -282,7 +283,8 @@ const Checkout = () => {
 
       console.log("📤 Enviando pedido al backend:", datosPedido);
 
-      const response = await fetch('http://localhost:8080/api/pedidos', {
+      // ✅ CORREGIDO: usar API_URL
+      const response = await fetch(`${API_URL}/pedidos`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
