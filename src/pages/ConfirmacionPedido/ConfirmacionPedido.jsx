@@ -1,34 +1,31 @@
 // src/pages/ConfirmacionPedido/ConfirmacionPedido.jsx
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import styles from "./ConfirmacionPedido.module.css";
 
 const ConfirmacionPedido = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [pedido, setPedido] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showAnimation, setShowAnimation] = useState(false);
 
   const nombreUsuario = localStorage.getItem("userName") || "cliente";
 
-
   useEffect(() => {
-    setTimeout(() => {
-      const pedidoData = location.state?.pedido || {
-        id: "PED-" + Math.floor(Math.random() * 10000),
-        tiempoEstimado: "25-35 minutos",
-        total: 576.8,
-        productos: [
-          { nombre: "Salmón Nigiri", cantidad: 2 },
-          { nombre: "Roll Spicy Tuna", cantidad: 1 },
-          { nombre: "Té Verde", cantidad: 1 },
-        ],
-      };
-      setPedido(pedidoData);
-      setLoading(false);
-      setTimeout(() => setShowAnimation(true), 100);
-    }, 1000);
-  }, [location]);
+    // ✅ Si no hay pedido en el state, redirigir al inicio
+    const pedidoData = location.state?.pedido;
+    
+    if (!pedidoData) {
+      console.error("❌ No se recibió información del pedido");
+      navigate("/");
+      return;
+    }
+    
+    setPedido(pedidoData);
+    setLoading(false);
+    setTimeout(() => setShowAnimation(true), 100);
+  }, [location, navigate]);
 
   const getMensajeHora = () => {
     const hora = new Date().getHours();
@@ -48,10 +45,13 @@ const ConfirmacionPedido = () => {
     );
   }
 
+  if (!pedido) {
+    return null;
+  }
+
   return (
     <div className={styles.container}>
       <div className={`${styles.confirmationCard} ${showAnimation ? styles.show : ""}`}>
-        {/* Ícono de éxito */}
         <div className={styles.successIcon}>
           <span>✓</span>
         </div>
@@ -63,7 +63,6 @@ const ConfirmacionPedido = () => {
           <p className={styles.subtitle}>Tu pedido ha sido confirmado</p>
         </div>
 
-        {/* Detalles del pedido */}
         <div className={styles.pedidoDetails}>
           <div className={styles.detailCard}>
             <div className={styles.detailIcon}>🍣</div>
@@ -90,7 +89,6 @@ const ConfirmacionPedido = () => {
           </div>
         </div>
 
-        {/* Resumen del pedido */}
         <div className={styles.resumenSection}>
           <h3>Resumen de tu pedido</h3>
           <div className={styles.resumenLista}>
@@ -103,7 +101,6 @@ const ConfirmacionPedido = () => {
           </div>
         </div>
 
-        {/* Botones de acción */}
         <div className={styles.actions}>
           <Link to="/menu" className={styles.btnSecondary}>
             ← Seguir explorando
