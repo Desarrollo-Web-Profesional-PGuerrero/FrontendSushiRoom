@@ -1,31 +1,64 @@
 // src/pages/ConfirmacionPedido/ConfirmacionPedido.jsx
 import React, { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { API_URL } from "../../services/api";
 import styles from "./ConfirmacionPedido.module.css";
 
 const ConfirmacionPedido = () => {
-  const location = useLocation();
+  const { numeroPedido } = useParams();
   const navigate = useNavigate();
   const [pedido, setPedido] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [showAnimation, setShowAnimation] = useState(false);
 
   const nombreUsuario = localStorage.getItem("userName") || "cliente";
 
   useEffect(() => {
-    // ✅ Si no hay pedido en el state, redirigir al inicio
-    const pedidoData = location.state?.pedido;
-    
-    if (!pedidoData) {
-      console.error("❌ No se recibió información del pedido");
-      navigate("/");
-      return;
-    }
-    
-    setPedido(pedidoData);
-    setLoading(false);
-    setTimeout(() => setShowAnimation(true), 100);
-  }, [location, navigate]);
+    const cargarPedido = async () => {
+      if (!numeroPedido) {
+        console.error("❌ No hay número de pedido en la URL");
+        setError(true);
+        setLoading(false);
+        return;
+      }
+
+      console.log("🔍 Buscando pedido:", numeroPedido);
+      
+      try {
+        const response = await fetch(`${API_URL}/pedidos/buscar/${numeroPedido}`);
+        const data = await response.json();
+        
+        console.log("📥 Respuesta del backend:", data);
+        
+        if (data.success && data.pedido) {
+          const pedidoData = {
+            numeroPedido: data.pedido.numeroPedido,
+            id: data.pedido.id,
+            tiempoEstimado: "25-35 minutos",
+            total: data.pedido.total,
+            productos: data.detalles?.map(d => ({
+              nombre: d.nombreProducto,
+              cantidad: d.cantidad
+            })) || []
+          };
+          setPedido(pedidoData);
+          setError(false);
+        } else {
+          console.error("❌ Pedido no encontrado");
+          setError(true);
+        }
+      } catch (err) {
+        console.error("❌ Error al cargar pedido:", err);
+        setError(true);
+      } finally {
+        setLoading(false);
+        setTimeout(() => setShowAnimation(true), 100);
+      }
+    };
+
+    cargarPedido();
+  }, [numeroPedido]);
 
   const getMensajeHora = () => {
     const hora = new Date().getHours();
@@ -39,14 +72,24 @@ const ConfirmacionPedido = () => {
       <div className={styles.loadingContainer}>
         <div className={styles.loadingContent}>
           <div className={styles.spinner}></div>
-          <p className={styles.loadingText}>Procesando tu pedido...</p>
+          <p className={styles.loadingText}>Cargando tu pedido...</p>
         </div>
       </div>
     );
   }
 
-  if (!pedido) {
-    return null;
+  if (error || !pedido) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.confirmationCard}>
+          <h2>¡Ups! Algo salió mal</h2>
+          <p>No pudimos encontrar tu pedido.</p>
+          <Link to="/menu" className={styles.btnPrimary}>
+            Volver al menú
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -68,7 +111,7 @@ const ConfirmacionPedido = () => {
             <div className={styles.detailIcon}>🍣</div>
             <div className={styles.detailInfo}>
               <span className={styles.detailLabel}>Número de pedido</span>
-              <span className={styles.detailValue}>#{pedido.numeroPedido || pedido.id}</span>
+              <span className={styles.detailValue}>#{pedido.numeroPedido}</span>
             </div>
           </div>
 
@@ -105,10 +148,7 @@ const ConfirmacionPedido = () => {
           <Link to="/menu" className={styles.btnSecondary}>
             ← Seguir explorando
           </Link>
-          <Link
-            to={`/estado-pedido/${pedido.numeroPedido || pedido.id}`}
-            className={styles.btnPrimary}
-          >
+          <Link to={`/estado-pedido/${pedido.numeroPedido}`} className={styles.btnPrimary}>
             Ver estado del pedido →
           </Link>
         </div>
