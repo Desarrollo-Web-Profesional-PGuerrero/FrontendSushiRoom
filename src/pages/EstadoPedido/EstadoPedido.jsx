@@ -127,9 +127,9 @@ const EstadoPedido = () => {
     }
   ];
 
-  // Función para cargar desde localStorage
+  // Función para cargar desde localStorage (respaldo)
   const cargarPedidoDesdeLocalStorage = useCallback((numeroPedido) => {
-    console.log("Buscando en localStorage:", numeroPedido);
+    console.log("🔍 Buscando en localStorage:", numeroPedido);
     const pedidosGuardados = localStorage.getItem("pedidos");
     if (pedidosGuardados) {
       const pedidos = JSON.parse(pedidosGuardados);
@@ -141,6 +141,35 @@ const EstadoPedido = () => {
     }
     return null;
   }, []);
+
+  // Función para cargar pedido desde el backend
+  const cargarPedidoDesdeBackend = useCallback(async () => {
+    if (!id) return null;
+    
+    try {
+      const response = await fetch(`${API_URL}/pedidos/buscar/${id}`);
+      if (response.ok) {
+        const data = await response.json();
+        console.log("✅ Pedido encontrado en backend:", data);
+        return data;
+      }
+    } catch (err) {
+      console.error("❌ Error al cargar pedido desde backend:", err);
+    }
+    return null;
+  }, [id]);
+
+  // Función para actualizar el estado del pedido
+  const actualizarEstado = useCallback(async () => {
+    const data = await cargarPedidoDesdeBackend();
+    if (data && isMounted.current) {
+      setPedido(data);
+      setError(null);
+      setLoading(false);
+      return true;
+    }
+    return false;
+  }, [cargarPedidoDesdeBackend]);
 
   // Función para cambiar dato curioso
   const cambiarDatoCurioso = useCallback(() => {
@@ -196,13 +225,25 @@ const EstadoPedido = () => {
     const cargarPedido = async () => {
       if (!id || !isMounted.current) return;
 
-      console.log('Cargando pedido número:', id);
+      console.log('🔄 Cargando pedido número:', id);
 
-      // PRIMERO: Buscar en localStorage
+      // 🔥 PRIMERO: Intentar con el backend (siempre)
+      const pedidoBackend = await cargarPedidoDesdeBackend();
+      
+      if (pedidoBackend) {
+        if (isMounted.current) {
+          console.log('✅ Usando pedido del backend');
+          setPedido(pedidoBackend);
+          setError(null);
+          setLoading(false);
+          return;
+        }
+      }
+
+      // SEGUNDO: Si el backend falla, buscar en localStorage como respaldo
       const pedidoLocal = cargarPedidoDesdeLocalStorage(id);
       
       if (pedidoLocal) {
-        // Convertir formato local al formato que espera el componente
         const pedidoFormateado = {
           pedido: {
             id: pedidoLocal.id,
@@ -221,48 +262,38 @@ const EstadoPedido = () => {
         };
         
         if (isMounted.current) {
-          console.log('✅ Usando pedido de localStorage');
+          console.log('⚠️ Usando pedido de localStorage (backend no disponible)');
           setPedido(pedidoFormateado);
           setError(null);
           setLoading(false);
+          return;
         }
-        return;
       }
 
-      // SEGUNDO: Intentar con el backend
-      try {
-        const response = await fetch(`${API_URL}/pedidos/buscar/${id}`);
-
-        if (response.ok) {
-          const data = await response.json();
-          if (isMounted.current) {
-            console.log('✅ Pedido encontrado en backend:', data);
-            setPedido(data);
-            setError(null);
-          }
-        } else {
-          if (isMounted.current) {
-            setError('Pedido no encontrado');
-          }
-        }
-      } catch (err) {
-        console.error('Error al cargar pedido:', err);
-        if (isMounted.current) {
-          setError('Error al cargar el pedido');
-        }
-      } finally {
-        if (isMounted.current) {
-          setLoading(false);
-        }
+      // Si nada funciona
+      if (isMounted.current) {
+        console.log('❌ Pedido no encontrado');
+        setError('Pedido no encontrado');
+        setLoading(false);
       }
     };
 
     cargarPedido();
 
-    // Configurar polling para actualizaciones
-    pollingIntervalRef.current = setInterval(() => {
-      if (isMounted.current && !cargarPedidoDesdeLocalStorage(id)) {
-        cargarPedido();
+    // Configurar polling para actualizaciones cada 5 segundos
+    pollingIntervalRef.current = setInterval(async () => {
+      if (isMounted.current) {
+        const pedidoBackend = await cargarPedidoDesdeBackend();
+        if (pedidoBackend && isMounted.current) {
+          // Verificar si el estado cambió
+          const estadoActual = pedido?.pedido?.estado;
+          const nuevoEstado = pedidoBackend.pedido?.estado;
+          
+          if (estadoActual !== nuevoEstado) {
+            console.log(`🔄 Estado actualizado: ${estadoActual} → ${nuevoEstado}`);
+            setPedido(pedidoBackend);
+          }
+        }
       }
     }, 5000);
 
@@ -272,7 +303,7 @@ const EstadoPedido = () => {
         clearInterval(pollingIntervalRef.current);
       }
     };
-  }, [id, cargarPedidoDesdeLocalStorage]);
+  }, [id, cargarPedidoDesdeBackend, cargarPedidoDesdeLocalStorage, pedido?.pedido?.estado]);
 
   if (loading) {
     return (
@@ -310,15 +341,15 @@ const EstadoPedido = () => {
   const getTiempoEstimado = () => {
     switch (estadoActual) {
       case 'pendiente':
-        return 'Tiempo estimado: 5-10 minutos';
+        return '⏳ Tiempo estimado: 5-10 minutos';
       case 'preparacion':
-        return 'Tiempo estimado: 15-20 minutos';
+        return '🍣 Tiempo estimado: 15-20 minutos';
       case 'listo':
-        return 'Tu pedido está listo para entregar';
+        return '✅ Tu pedido está listo para entregar';
       case 'entregado':
-        return '¡Disfruta tu sushi!';
+        return '🎉 ¡Disfruta tu sushi!';
       default:
-        return 'Procesando tu pedido...';
+        return '⏳ Procesando tu pedido...';
     }
   };
 
@@ -450,7 +481,7 @@ const EstadoPedido = () => {
 
             <div className={styles.curiousFooter}>
               <div className={styles.curiousMessage}>
-                <span>Mientras esperas, aprende más sobre sushi</span>
+                <span>📖 Mientras esperas, aprende más sobre sushi</span>
               </div>
               <button
                 className={styles.curiousNextBtn}
