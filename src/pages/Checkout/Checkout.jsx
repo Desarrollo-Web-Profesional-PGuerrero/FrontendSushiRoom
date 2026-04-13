@@ -344,18 +344,10 @@ const Checkout = () => {
       vaciarCarrito();
       setIsSubmitting(false);
 
-      // Redirigir a confirmación con el número de pedido del backend
-      navigate("/confirmacion", {
-        state: {
-          pedido: {
-            numeroPedido: data.pedido?.numeroPedido || nuevoPedido.numeroPedido,
-            id: data.pedido?.id || nuevoPedido.id,
-            tiempoEstimado: nuevoPedido.tiempoEstimado,
-            total: nuevoPedido.total,
-            productos: nuevoPedido.productos,
-          },
-        },
-      });
+       // 🔥 NUEVO: Obtener el número de pedido y redirigir con él en la URL
+      const numeroPedidoFinal = data.pedido?.numeroPedido || nuevoPedido.numeroPedido;
+      console.log("📦 Redirigiendo con número:", numeroPedidoFinal);
+      navigate(`/confirmacion/${numeroPedidoFinal}`);
     } catch (err) {
       console.error("❌ Error al procesar el pedido:", err);
       setError(err.message || "Ocurrió un error al procesar tu pedido. Por favor, intenta de nuevo.");
