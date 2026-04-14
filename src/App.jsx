@@ -24,6 +24,7 @@ import NotFound from "./pages/NotFound/NotFound";
 import Breadcrumbs from "./components/Breadcrumbs/Breadcrumbs";
 import ResetPassword from "./pages/ResetPassword/ResetPassword";
 import TwoFactorVerify from './pages/TwoFactorVerify/TwoFactorVerify';
+import Sitemap from "./pages/Sitemap/Sitemap"; // ← IMPORTAR SITEMAP
 import "./App.css";
 
 function App() {
@@ -43,9 +44,7 @@ function App() {
                   <Route path="/producto/:id" element={<ProductoDetalle />} />
                   <Route path="/carrito" element={<Carrito />} />
                   <Route path="/checkout" element={<Checkout />} />
-                  {/* ✅ Ruta antigua (respaldo) */}
                   <Route path="/confirmacion" element={<ConfirmacionPedido />} />
-                  {/* ✅ NUEVA RUTA con número de pedido en URL */}
                   <Route path="/confirmacion/:numeroPedido" element={<ConfirmacionPedido />} />
                   <Route path="/estado-pedido/:id" element={<EstadoPedido />} />
                   <Route path="/admin/login" element={<AdminLogin />} />
@@ -62,6 +61,7 @@ function App() {
                   <Route path="/login" element={<Login />} />
                   <Route path="/verify-2fa" element={<TwoFactorVerify />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route path="/sitemap" element={<Sitemap />} /> {/* ← AGREGAR RUTA */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </main>
